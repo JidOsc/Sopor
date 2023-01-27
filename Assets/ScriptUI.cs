@@ -13,8 +13,5 @@ public class ScriptUI : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
-        if(Input.GetKey(KeyCode.Space))
-        { GameObject.Find("Door").GetComponent<BoxCollider2D>().isTrigger = !GameObject.Find("Door").GetComponent<BoxCollider2D>().isTrigger; }
-    }
+    { }
 }
