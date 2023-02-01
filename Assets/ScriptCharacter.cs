@@ -7,14 +7,13 @@ public class ScriptCharacter : MonoBehaviour
     public int speed = 1;
     public new Rigidbody2D rigidbody;
 
-    private bool doorOut = false;
+    private bool cooldown = false;
 
     // Start is called before the first frame update
     void Start()
     {
         
     }
-
 
     private void FixedUpdate()
     {
@@ -26,42 +25,32 @@ public class ScriptCharacter : MonoBehaviour
 
         else
         { rigidbody.velocity = new Vector2(0, 0); }
-
-
-        if (Input.GetKey(KeyCode.Space) && doorOut)
-        {
-            GameObject.Find("doorOut").GetComponent<BoxCollider2D>().isTrigger = !GameObject.Find("doorOut").GetComponent<BoxCollider2D>().isTrigger;
-        }
     }
     // Update is called once per frame
     void Update()
     {
+        GameObject.Find("Main Camera").transform.position = new Vector3((transform.position.x + GameObject.Find("Main Camera").transform.position.x) / 2, 0, -10);
     }
 
-
-    //private void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //if(collision.transform.name == "door")
-    // {rigidbody.velocity *= -1;}
-    //}
-
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        if(collision.transform.name == "doorOut")
+        if (collision.transform.name.StartsWith("door") && Input.GetKey(KeyCode.Space) && cooldown == false)
         {
-            GameObject.Find("popupSpace").GetComponent<SpriteRenderer>().enabled = true;
-            doorOut = true;
-            print("true");
+            collision.GetComponent<BoxCollider2D>().enabled = !collision.GetComponent<BoxCollider2D>().enabled;
+            cooldown = true;
+            Invoke("Cooldown", 0.2f);
         }
     }
 
-    private void OnCollisionExit2D(Collision2D collision)
+    private void Cooldown()
+    { cooldown = false; }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {GameObject.Find("popupSpace").GetComponent<SpriteRenderer>().enabled = false;}
+
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.transform.name == "doorOut")
-        {
-            GameObject.Find("popupSpace").GetComponent<SpriteRenderer>().enabled = false;
-            doorOut = false;
-            print("false");
-        }
+        GameObject.Find("popupSpace").transform.position = new Vector3(collision.transform.position.x, collision.transform.position.y + 1.5f, -1);
+        GameObject.Find("popupSpace").GetComponent<SpriteRenderer>().enabled = true;
     }
 }
