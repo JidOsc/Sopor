@@ -14,4 +14,9 @@ public class ScriptUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     { }
+
+    void UpdateDialogue(string text)
+    {
+
+    }
 }
