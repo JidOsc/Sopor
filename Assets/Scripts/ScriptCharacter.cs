@@ -10,15 +10,17 @@ public class ScriptCharacter : MonoBehaviour
     private bool cooldown = false;
     private bool carryingtrash = false;
     private bool opentrash = false;
-    private GameObject detectedobject = null;
     private bool colliding = false;
+
+    private GameObject detectedobject = null;
+    
 
  private void FixedUpdate()
     {
         if (Input.GetKey(KeyCode.LeftShift))
         { speed = 6; }
 
-        else { speed = 4; }
+        else { speed = 3; }
 
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
         { rigidbody.velocity = new Vector2(speed, 0); }
@@ -83,7 +85,6 @@ public class ScriptCharacter : MonoBehaviour
 
     private void Cooldown()
     { cooldown = false;
-        print("cooldown slut");
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
