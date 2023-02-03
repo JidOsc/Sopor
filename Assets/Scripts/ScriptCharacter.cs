@@ -11,6 +11,9 @@ public class ScriptCharacter : MonoBehaviour
     private bool carryingtrash = false;
     private bool opentrash = false;
     private bool colliding = false;
+    private bool hidden = false;
+
+    private short trashthrown = 0;
 
     private GameObject detectedobject = null;
     
@@ -22,57 +25,85 @@ public class ScriptCharacter : MonoBehaviour
 
         else { speed = 3; }
 
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-        { rigidbody.velocity = new Vector2(speed, 0); }
+        if (!hidden)
+        {
+            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+            { rigidbody.velocity = new Vector2(speed, 0); }
 
-        else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-        { rigidbody.velocity = new Vector2(-speed, 0); }
+            else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+            { rigidbody.velocity = new Vector2(-speed, 0); }
 
-        else
-        { rigidbody.velocity = new Vector2(0, 0); }
-
+            else
+            { rigidbody.velocity = new Vector2(0, 0); }
+        }
 
         if(Input.GetKey(KeyCode.Space) && cooldown == false && colliding)
         {
-            if (detectedobject.transform.name.StartsWith("door"))
+            if (detectedobject.transform.name.StartsWith("Door"))
             { detectedobject.GetComponent<BoxCollider2D>().enabled = !detectedobject.GetComponent<BoxCollider2D>().enabled;
 
-                if (detectedobject.GetComponent<SpriteRenderer>().color == Color.white)
-                { detectedobject.GetComponent<SpriteRenderer>().color = Color.red; }
-                else
-                { detectedobject.GetComponent<SpriteRenderer>().color = Color.white; }
+                //debug-kod, ska tas bort
+                    if (detectedobject.GetComponent<SpriteRenderer>().color == Color.white)
+                    { detectedobject.GetComponent<SpriteRenderer>().color = Color.red; }
+                    else
+                    { detectedobject.GetComponent<SpriteRenderer>().color = Color.white; }
 
-                cooldown = true;
-                Invoke("Cooldown", 0.4f); }
+                StartCooldown(0.4f);
+            }
 
             else if (detectedobject.transform.name.StartsWith("trash") && carryingtrash == false)
             {
                 carryingtrash = true;
                 Destroy(detectedobject.gameObject);
-                cooldown = true;
-                Invoke("Cooldown", 0.2f);
+
+                StartCooldown(0.2f);
             }
 
-            else if (detectedobject.transform.name == "soptunna")
+            else if (detectedobject.transform.name == "Trashcan")
             {
                 if (opentrash && carryingtrash)
                 {
                     carryingtrash = false;
                     print("slängde sopor");
+
+                    trashthrown += 1;
+
+                    print("har slängt " + trashthrown);
+
+                    StartCooldown(0.2f);
                 }
                 else
                 {
                     opentrash = !opentrash;
-                    if (detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color == Color.red)
-                    { detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.white; }
 
-                    else
-                    { detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.red; }
+                    //debug-kod, ska tas bort
+                        if (detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color == Color.red)
+                        { detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.white; }
+                        else
+                        { detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.red; }
 
                     print("öppnade luckan");
 
-                    cooldown = true;
-                    Invoke("Cooldown", 0.2f);
+                    StartCooldown(0.2f);
+                }
+            }
+
+            else if (detectedobject.transform.name.StartsWith("Wardrobe") && !cooldown)
+            {
+                if(hidden)
+                {
+
+                    StartCooldown(0.6f);
+                    hidden = false;
+                    GetComponent<SpriteRenderer>().enabled = true;
+                }
+
+                else
+                {
+                    StartCooldown(0.6f);
+                    hidden = true;
+                    GetComponent<SpriteRenderer>().enabled = false;
+                    GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
                 }
             }
         }
@@ -80,7 +111,14 @@ public class ScriptCharacter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        GameObject.Find("Main Camera").transform.position = new Vector3((transform.position.x + GameObject.Find("Main Camera").transform.position.x) / 2, 0, -10);
+        GameObject.Find("CAMERA").transform.position = new Vector3((transform.position.x + GameObject.Find("CAMERA").transform.position.x) / 2, 0, -10);
+    }
+
+    private void StartCooldown(float duration)
+    {
+        //funktion för att istället för att skriva samma två rader av kod hela tiden kunna korta ner det
+        cooldown = true;
+        Invoke("Cooldown", duration);
     }
 
     private void Cooldown()
@@ -89,6 +127,7 @@ public class ScriptCharacter : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        print("1");
         detectedobject = collision.gameObject;
         colliding = true;
 
@@ -97,7 +136,13 @@ public class ScriptCharacter : MonoBehaviour
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
-        colliding = false;
-        detectedobject = null;
-        GameObject.Find("popupSpace").GetComponent<SpriteRenderer>().enabled = false;}
+        print("0");
+
+        if (detectedobject == collision.gameObject)
+        {
+            colliding = false;
+            detectedobject = null;
+            GameObject.Find("popupSpace").GetComponent<SpriteRenderer>().enabled = false;
+        }
+    }
 }
