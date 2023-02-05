@@ -6,14 +6,13 @@ public class ScriptCharacter : MonoBehaviour
 {
     public int speed = 1;
     public new Rigidbody2D rigidbody;
+    public GameObject Canvas;
 
     private bool cooldown = false;
     private bool carryingtrash = false;
     private bool opentrash = false;
     private bool colliding = false;
     private bool hidden = false;
-
-    private short trashthrown = 0;
 
     private GameObject detectedobject = null;
     
@@ -66,9 +65,7 @@ public class ScriptCharacter : MonoBehaviour
                     carryingtrash = false;
                     print("slängde sopor");
 
-                    trashthrown += 1;
-
-                    print("har slängt " + trashthrown);
+                    Canvas.GetComponent<ScriptUI>().UpdateProgress(1);
 
                     StartCooldown(0.2f);
                 }
