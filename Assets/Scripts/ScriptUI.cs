@@ -6,7 +6,17 @@ using TMPro;
 public class ScriptUI : MonoBehaviour
 {
     private short trashthrown;
-    private string line;
+    private string line = "";
+    private bool done = true;
+
+    string[] lines = {
+        "Nu har du slängt 2 soppåsar!",
+        "3 soppåsar har slängts",
+        "Vem är där?"
+                     };
+
+
+    private short linenumber;
 
     public GameObject dialoguetext;
     public GameObject portrait1;
@@ -22,29 +32,20 @@ public class ScriptUI : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    { }
+    {
+        if(Input.GetKeyDown(KeyCode.Space) && line != "")
+        {
+            dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters = line.Length;
+        }
+    
+    }
 
     private void FixedUpdate()
     {
-            
-    }
-
-    IEnumerator RevealText()
-    {
-
-        while(dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters < line.Length)
+        if(Input.GetKeyDown(KeyCode.Space))
         {
-            dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters += 1;
-            yield return new WaitForSeconds(0.1f);
-        }
-        Invoke("ClearDialogue", 2f);
-    }
 
-    private void ClearDialogue()
-    {
-        line = "";
-        portrait1.SetActive(false);
-        dialoguetext.GetComponent<TMP_Text>().text = "";
+        }
     }
 
     public void UpdateProgress(short trashpicked)
@@ -52,33 +53,84 @@ public class ScriptUI : MonoBehaviour
         trashthrown += trashpicked;
         print(trashthrown);
 
-        switch(trashthrown)
+        switch (trashthrown)
         {
             case 2:
-                ShowDialogue("Tja, du har nyss plockat din andra soppåse", 1);
+                StartCoroutine(Dialogue(1));
+                break;
+
+            case 3:
+                StartCoroutine(Dialogue(2));
+                break;
+        }
+    }
+
+    IEnumerator Dialogue(short convonumber)
+    {
+        switch(convonumber)
+        {
+            case 1:
+                yield return new WaitForSeconds(1);
+                ShowDialogue(lines[0], 1);
+
+                while (dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters < line.Length)
+                {
+                    yield return new WaitForSeconds(0.5f);
+                    dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters += 1;
+                }
+                Invoke("ClearDialogue", 2f);
+
+                break;
+
+            case 2:
+                yield return new WaitForSeconds(1);
+                ShowDialogue(lines[1], 1);
+
+                while (dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters < line.Length)
+                {
+                    yield return new WaitForSeconds(0.5f);
+                    dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters += 1;
+                }
+                Invoke("ClearDialogue", 2f);
+
+                ShowDialogue(lines[2], 1);
+
+                while (dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters < line.Length)
+                {
+                    yield return new WaitForSeconds(0.5f);
+                    dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters += 1;
+                }
+                Invoke("ClearDialogue", 2f);
+
                 break;
         }
     }
 
     void ShowDialogue(string text, short portrait)
     {
-        print("beep");
         switch (portrait)
         {
             case 1:
                 print("boop");
                 portrait1.SetActive(true);
                 break;
+
+            case 2:
+                print("biip");
+                portrait1.SetActive(true);
+                break;
         }
 
         line = text;
-
         dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters = 0;
-    
-        StartCoroutine("RevealText");
 
         dialoguetext.GetComponent<TMP_Text>().text = text;
+    }
 
-
+    private void ClearDialogue()
+    {
+        line = "";
+        portrait1.SetActive(false);
+        dialoguetext.GetComponent<TMP_Text>().text = "";
     }
 }
