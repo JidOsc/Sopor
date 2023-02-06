@@ -20,6 +20,8 @@ public class ScriptUI : MonoBehaviour
 
     public GameObject dialoguetext;
     public GameObject portrait1;
+    public GameObject character;
+    public GameObject stalker;
 
     // Start is called before the first frame update
     void Start()
@@ -28,12 +30,22 @@ public class ScriptUI : MonoBehaviour
         //transform.GetChild(0).GetComponent<TMP_Text>().maxVisibleCharacters = 3;
 
         portrait1.SetActive(false);
+        character = GameObject.Find("CHARACTER");
+        stalker = GameObject.Find("Stalker");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space) && line != "")
+        if (character.transform.position == new Vector3(-2.48f, 1.5f, 0f));
+        //-2.48f, 1.5f, 0
+        {
+
+            stalker.transform.position = new Vector3((character.transform.position.x) + 0.1f, 1f, 0f);
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && line != "")
         {
             dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters = line.Length;
         }
@@ -57,6 +69,9 @@ public class ScriptUI : MonoBehaviour
         {
             case 2:
                 StartCoroutine(Dialogue(1));
+                stalker.GetComponent<SpriteRenderer>().enabled = true;
+                stalker.transform.position = new Vector3(4.5f, 1.04f, 0);
+                //= new Vector3((character.transform.position.x) + 10, 1, 0);
                 break;
 
             case 3:
