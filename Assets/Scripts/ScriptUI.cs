@@ -7,7 +7,9 @@ public class ScriptUI : MonoBehaviour
 {
     private short trashthrown;
     private string line = "";
+
     private bool done = true;
+    private bool stalker1 = false;
 
     string[] lines = {
         "Nu har du slängt 2 soppåsar!",
@@ -37,7 +39,7 @@ public class ScriptUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (character.transform.position == new Vector3(-2.48f, 1.5f, 0f));
+        if (character.transform.position == new Vector3(-2.48f, 1.5f, 0f))
         //-2.48f, 1.5f, 0
         {
 
@@ -69,6 +71,8 @@ public class ScriptUI : MonoBehaviour
         {
             case 2:
                 StartCoroutine(Dialogue(1));
+
+                stalker1 = true;
                 stalker.GetComponent<SpriteRenderer>().enabled = true;
                 stalker.transform.position = new Vector3(4.5f, 1.04f, 0);
                 //= new Vector3((character.transform.position.x) + 10, 1, 0);
@@ -77,6 +81,15 @@ public class ScriptUI : MonoBehaviour
             case 3:
                 StartCoroutine(Dialogue(2));
                 break;
+        }
+    }
+
+    IEnumerator FirstStalker()
+    {
+        while(character.transform.position.x < 0)
+        {
+            yield return new WaitForSeconds(0.2f);
+            stalker.transform.position = new Vector3(stalker.transform.position.x + 0.1f, 1, 0);
         }
     }
 
@@ -98,6 +111,8 @@ public class ScriptUI : MonoBehaviour
                 break;
 
             case 2:
+                StartCoroutine(FirstStalker());
+                
                 yield return new WaitForSeconds(1);
                 ShowDialogue(lines[1], 1);
 
