@@ -22,7 +22,8 @@ public class ScriptCharacter : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift))
         { speed = 6; }
 
-        else { speed = 3; }
+        else if (speed != 3)
+        { speed = 3; }
 
         if (!hidden)
         {
