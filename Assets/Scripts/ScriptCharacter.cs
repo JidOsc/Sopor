@@ -166,10 +166,6 @@ public class ScriptCharacter : MonoBehaviour
 
         GameObject.Find("popupSpace").transform.position = new Vector3(collision.transform.position.x, collision.transform.position.y + 1.5f, -1);
         GameObject.Find("popupSpace").GetComponent<SpriteRenderer>().enabled = true;
-        if (collision.transform.name == "triggerzone")
-        {
-            GameObject.Find("Stalker").GetComponent<SpriteRenderer>().enabled = true;
-        }
     }
     private void OnTriggerExit2D(Collider2D collision)
     {

@@ -63,7 +63,6 @@ public class ScriptUI : MonoBehaviour
 
         character = GameObject.Find("CHARACTER");
         stalker = GameObject.Find("Stalker");
-        stalker.transform.position = new Vector3(4.5f, 1.04f, 0);
     }
 
     // Update is called once per frame
@@ -86,7 +85,10 @@ public class ScriptUI : MonoBehaviour
         {
             case 2:
                 StartCoroutine(Dialogue(1));
-                GameObject.Find("triggerzone").GetComponent<BoxCollider2D>().enabled = true;
+
+                stalker.GetComponent<SpriteRenderer>().enabled = true;
+                stalker.transform.position = new Vector3(4.5f, 1.04f, 0);
+                //= new Vector3((character.transform.position.x) + 10, 1, 0);
                 break;
 
             case 3:
