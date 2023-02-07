@@ -110,11 +110,6 @@ public class ScriptCharacter : MonoBehaviour
             }
         }
     }
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     private void Start()
     {
@@ -144,6 +139,7 @@ public class ScriptCharacter : MonoBehaviour
 
     private void CheckCamera()
     {
+        //om karaktären är mer än 6.2 enheter bort från kamerans mittpunkt så kommer kameran flyttas 12 enheter i den riktningen
         if (cam.transform.position.x + 6.2f < transform.position.x){cam.transform.position = new Vector3(cam.transform.position.x + 12, cam.transform.position.y, -10); StartCoroutine("Fade"); }
         else if (cam.transform.position.x - 6.2f > transform.position.x){cam.transform.position = new Vector3(cam.transform.position.x - 12, cam.transform.position.y, -10);StartCoroutine("Fade"); }
     }
@@ -156,7 +152,9 @@ public class ScriptCharacter : MonoBehaviour
     }
 
     private void Cooldown()
-    { cooldown = false;
+    { 
+        //eftersom den kallas med en Invoke() kommer cooldown avaktiveras efter önskad tid
+        cooldown = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -166,6 +164,7 @@ public class ScriptCharacter : MonoBehaviour
 
         GameObject.Find("popupSpace").transform.position = new Vector3(collision.transform.position.x, collision.transform.position.y + 1.5f, -1);
         GameObject.Find("popupSpace").GetComponent<SpriteRenderer>().enabled = true;
+
         if (collision.transform.name == "triggerzone")
         {
             GameObject.Find("Stalker").GetComponent<SpriteRenderer>().enabled = true;

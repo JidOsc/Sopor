@@ -88,6 +88,10 @@ public class ScriptUI : MonoBehaviour
             case 3:
                 StartCoroutine(Dialogue(2));
                 break;
+
+            case 4:
+                StartCoroutine(Dialogue(3));
+                break;
         }
     }
 
@@ -130,20 +134,21 @@ public class ScriptUI : MonoBehaviour
 
                 done = false;   ShowDialogue(lines[11], 2); while (!done) { yield return null; }
 
-                done = false;   ShowDialogue(lines[12], 3); while (!done) { yield return null; }
+                done = false;   ShowDialogue(lines[12], 1); while (!done) { yield return null; }
+
+                done = false;   ShowDialogue(lines[13], 3); while (!done) { yield return null; }
 
                 break;
 
 
             case 2:
-                ShowDialogue(lines[1], 1);
+                done = false; ShowDialogue(lines[14], 1); while (!done) { yield return null; }
 
+                break;
 
-                StartCoroutine(RevealText());
-                
-                Invoke("ClearDialogue", 2f);
+            case 3:
+                done = false; ShowDialogue(lines[15], 1); while (!done) { yield return null; }
 
-                print(6);
                 break;
         }
     }
