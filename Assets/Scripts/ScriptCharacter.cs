@@ -118,6 +118,7 @@ public class ScriptCharacter : MonoBehaviour
 
     private void Start()
     {
+        StartCoroutine(Fade());
         InvokeRepeating("CheckCamera", 0.5f, 0.5f);
     }
 
@@ -125,24 +126,20 @@ public class ScriptCharacter : MonoBehaviour
     {
         isfading = true;
         GetComponent<Rigidbody2D>().velocity = new Vector2(0,0);
-        print(1);
         Color fadecolor = fadebox.GetComponent<Image>().color;
         fadecolor.a = 1;
 
         fadebox.GetComponent<Image>().color = fadecolor;
 
-        yield return new WaitForSeconds(0.15f);
-        print(3);
+        yield return new WaitForSeconds(0.02f);
 
         while (fadecolor.a > 0)
         {
-            print(4);
             yield return new WaitForSeconds(0.01f);
-            fadecolor.a -= 0.2f;
+            fadecolor.a -= 0.1f;
             fadebox.GetComponent<Image>().color = fadecolor;
         }
         isfading = false;
-        print(5);
     }
 
     private void CheckCamera()

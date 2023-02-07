@@ -1,4 +1,5 @@
 using System.Collections;
+
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -9,19 +10,45 @@ public class ScriptUI : MonoBehaviour
     private string line = "";
 
     private bool done = true;
-    private bool stalker1 = false;
 
     string[] lines = {
-        "Nu har du slängt 2 soppåsar!",
-        "3 soppåsar har slängts",
-        "Vem är där?"
+        "*Incoming call*",
+        "Hey cutie, I'm like- stuck in traffic with a bunch of groceries!",
+        "Okay?",
+        "You don't have to be so cold, cutie! Buuut… I do need you to do something for me.",
+        "And what’s in it for me?",
+        "I have a new nomster flavor for you, just do what I tell you!",
+        "Okay okay. What do you want me to do?",
+        "Just pick up some of the trash in the house and take it out!",
+        "Luna, it's 11 pm, can't I do it tomorrow-",
+        "Well, you're still up so liiike... why not? Unless you do not want the nomster…",
+        "Fine, fine. I'll do it!",
+        "Hell yeah, stay safe, cutie!",
+        "Ugh. Whatever, bye...",
+        "Call ends.",
+
+        "Ew, this stinks",
+        "I guess it's about time we cleaned this out...",
+        "Jesus, this looks like shit...",
+
+        "What was that?",
+
+        "You already home?",
+        "...",
+        "Hello? ...Luna?",
+
+        "FUCK-"
                      };
 
 
     private short linenumber;
 
     public GameObject dialoguetext;
-    public GameObject portrait1;
+
+    public GameObject portraitluna;
+    public GameObject portraitchar;
+    public GameObject portraitstal;
+    
     public GameObject character;
     public GameObject stalker;
 
@@ -29,9 +56,11 @@ public class ScriptUI : MonoBehaviour
     void Start()
     {
         trashthrown = 0;
-        //transform.GetChild(0).GetComponent<TMP_Text>().maxVisibleCharacters = 3;
 
-        portrait1.SetActive(false);
+        portraitchar.SetActive(false);
+        portraitluna.SetActive(false);
+        portraitstal.SetActive(false);
+
         character = GameObject.Find("CHARACTER");
         stalker = GameObject.Find("Stalker");
     }
@@ -40,24 +69,9 @@ public class ScriptUI : MonoBehaviour
     void Update()
     {
         if (character.transform.position == new Vector3(-2.48f, 1.5f, 0f))
-        //-2.48f, 1.5f, 0
         {
 
             stalker.transform.position = new Vector3((character.transform.position.x) + 0.1f, 1f, 0f);
-
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space) && line != "")
-        {
-            dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters = line.Length;
-        }
-    
-    }
-
-    private void FixedUpdate()
-    {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
 
         }
     }
@@ -72,7 +86,6 @@ public class ScriptUI : MonoBehaviour
             case 2:
                 StartCoroutine(Dialogue(1));
 
-                stalker1 = true;
                 stalker.GetComponent<SpriteRenderer>().enabled = true;
                 stalker.transform.position = new Vector3(4.5f, 1.04f, 0);
                 //= new Vector3((character.transform.position.x) + 10, 1, 0);
@@ -84,54 +97,59 @@ public class ScriptUI : MonoBehaviour
         }
     }
 
-    IEnumerator FirstStalker()
+    IEnumerator RevealText()
     {
-        while(character.transform.position.x < 0)
+        while (dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters < line.Length)
         {
-            yield return new WaitForSeconds(0.2f);
-            stalker.transform.position = new Vector3(stalker.transform.position.x + 0.1f, 1, 0);
+            yield return new WaitForSeconds(0.07f);
+            dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters += 1;
         }
+        Invoke("ClearDialogue", 2f);
     }
 
-    IEnumerator Dialogue(short convonumber)
+    IEnumerator Dialogue(short convo)
     {
-        switch(convonumber)
+        switch(convo)
         {
             case 1:
-                yield return new WaitForSeconds(1);
-                ShowDialogue(lines[0], 1);
+                done = false;   ShowDialogue(lines[0], 3);  while (!done) { yield return null; }
 
-                while (dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters < line.Length)
-                {
-                    yield return new WaitForSeconds(0.5f);
-                    dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters += 1;
-                }
-                Invoke("ClearDialogue", 2f);
+                done = false;   ShowDialogue(lines[1], 2);  while (!done) { yield return null; }
+
+                done = false;   ShowDialogue(lines[2], 1);  while (!done) { yield return null; }
+
+                done = false;   ShowDialogue(lines[3], 2);  while (!done) { yield return null; }
+
+                done = false;   ShowDialogue(lines[4], 1);  while (!done) { yield return null; }
+
+                done = false;   ShowDialogue(lines[5], 2);  while (!done) { yield return null; }
+
+                done = false;   ShowDialogue(lines[6], 1);  while (!done) { yield return null; }
+
+                done = false;   ShowDialogue(lines[7], 2);  while (!done) { yield return null; }
+
+                done = false;   ShowDialogue(lines[8], 1);  while (!done) { yield return null; }
+
+                done = false;   ShowDialogue(lines[9], 2);  while (!done) { yield return null; }
+
+                done = false;   ShowDialogue(lines[10], 1); while (!done) { yield return null; }
+
+                done = false;   ShowDialogue(lines[11], 2); while (!done) { yield return null; }
+
+                done = false;   ShowDialogue(lines[12], 3); while (!done) { yield return null; }
 
                 break;
 
+
             case 2:
-                StartCoroutine(FirstStalker());
-                
-                yield return new WaitForSeconds(1);
                 ShowDialogue(lines[1], 1);
 
-                while (dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters < line.Length)
-                {
-                    yield return new WaitForSeconds(0.5f);
-                    dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters += 1;
-                }
+
+                StartCoroutine(RevealText());
+                
                 Invoke("ClearDialogue", 2f);
 
-                ShowDialogue(lines[2], 1);
-
-                while (dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters < line.Length)
-                {
-                    yield return new WaitForSeconds(0.5f);
-                    dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters += 1;
-                }
-                Invoke("ClearDialogue", 2f);
-
+                print(6);
                 break;
         }
     }
@@ -141,26 +159,34 @@ public class ScriptUI : MonoBehaviour
         switch (portrait)
         {
             case 1:
-                print("boop");
-                portrait1.SetActive(true);
+                portraitchar.SetActive(true);
                 break;
 
             case 2:
-                print("biip");
-                portrait1.SetActive(true);
+                portraitluna.SetActive(true);
+                break;
+
+            case 3:
+                portraitstal.SetActive(true);
                 break;
         }
 
         line = text;
         dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters = 0;
-
         dialoguetext.GetComponent<TMP_Text>().text = text;
+
+        StartCoroutine(RevealText());
     }
 
     private void ClearDialogue()
     {
         line = "";
-        portrait1.SetActive(false);
+
+        portraitchar.SetActive(false);
+        portraitluna.SetActive(false);
+        portraitstal.SetActive(false);
+
         dialoguetext.GetComponent<TMP_Text>().text = "";
+        done = true;
     }
 }
