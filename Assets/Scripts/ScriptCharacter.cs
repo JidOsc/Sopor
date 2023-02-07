@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class ScriptCharacter : MonoBehaviour
 {
@@ -14,7 +15,9 @@ public class ScriptCharacter : MonoBehaviour
     private bool colliding = false;
     private bool hidden = false;
 
+    public GameObject cam;
     private GameObject detectedobject = null;
+    public GameObject fadebox;
     
 
  private void FixedUpdate()
@@ -109,7 +112,27 @@ public class ScriptCharacter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        GameObject.Find("CAMERA").transform.position = new Vector3((transform.position.x + GameObject.Find("CAMERA").transform.position.x) / 2, 0, -10);
+
+    }
+
+    private void Start()
+    {
+        InvokeRepeating("CheckCamera", 0.5f, 0.5f);
+    }
+
+    IEnumerator Fade()
+    {
+        while(fadebox.GetComponent<Image>().tintColor.a < 255)
+        {
+            yield return new WaitForSeconds(0.01f);
+            fadebox.GetComponent<Image>().tintColor.a + 1;
+        }
+    }
+
+    private void CheckCamera()
+    {
+        if (cam.transform.position.x + 7 < transform.position.x){cam.transform.position = new Vector3(cam.transform.position.x + 12, cam.transform.position.y, -10);}
+        else if (cam.transform.position.x - 7 > transform.position.x){cam.transform.position = new Vector3(cam.transform.position.x - 12, cam.transform.position.y, -10);}
     }
 
     private void StartCooldown(float duration)
@@ -125,7 +148,6 @@ public class ScriptCharacter : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        print("1");
         detectedobject = collision.gameObject;
         colliding = true;
 
@@ -134,8 +156,6 @@ public class ScriptCharacter : MonoBehaviour
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
-        print("0");
-
         if (detectedobject == collision.gameObject)
         {
             colliding = false;

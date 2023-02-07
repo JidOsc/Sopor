@@ -158,6 +158,7 @@ MonoBehaviour:
   speed: 4
   rigidbody: {fileID: 164404369}
   Canvas: {fileID: 1898981755}
+  cam: {fileID: 519420028}
 --- !u!50 &164404369
 Rigidbody2D:
   serializedVersion: 4
@@ -239,7 +240,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 164404367}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.5, y: 0, z: 0}
+  m_LocalPosition: {x: -4, y: 0, z: 0}
   m_LocalScale: {x: 0.19948433, y: 0.44751912, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1074,15 +1075,15 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
-  field of view: 45
+  field of view: 38
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2147483647
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -1102,7 +1103,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.5, y: 0, z: -10}
+  m_LocalPosition: {x: -4, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1255,7 +1256,7 @@ Transform:
   m_GameObject: {fileID: 669452145}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.3176, y: -5.18, z: 0}
-  m_LocalScale: {x: 92.567444, y: 8.9808, z: 1}
+  m_LocalScale: {x: 92.567444, y: 9.783459, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2740,6 +2741,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dialoguetext: {fileID: 1866469970}
   portrait1: {fileID: 1466331294}
+  character: {fileID: 0}
+  stalker: {fileID: 0}
 --- !u!114 &1898981757
 MonoBehaviour:
   m_ObjectHideFlags: 0
