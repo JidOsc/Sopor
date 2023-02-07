@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 public class ScriptCharacter : MonoBehaviour
 {
@@ -14,6 +14,7 @@ public class ScriptCharacter : MonoBehaviour
     private bool opentrash = false;
     private bool colliding = false;
     private bool hidden = false;
+    private bool isfading = false;
 
     public GameObject cam;
     private GameObject detectedobject = null;
@@ -28,7 +29,7 @@ public class ScriptCharacter : MonoBehaviour
         else if (speed != 3)
         { speed = 3; }
 
-        if (!hidden)
+        if (!hidden && !isfading)
         {
             if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
             { rigidbody.velocity = new Vector2(speed, 0); }
@@ -122,17 +123,32 @@ public class ScriptCharacter : MonoBehaviour
 
     IEnumerator Fade()
     {
-        while(fadebox.GetComponent<Image>().tintColor.a < 255)
+        isfading = true;
+        GetComponent<Rigidbody2D>().velocity = new Vector2(0,0);
+        print(1);
+        Color fadecolor = fadebox.GetComponent<Image>().color;
+        fadecolor.a = 1;
+
+        fadebox.GetComponent<Image>().color = fadecolor;
+
+        yield return new WaitForSeconds(0.15f);
+        print(3);
+
+        while (fadecolor.a > 0)
         {
+            print(4);
             yield return new WaitForSeconds(0.01f);
-            fadebox.GetComponent<Image>().tintColor.a + 1;
+            fadecolor.a -= 0.2f;
+            fadebox.GetComponent<Image>().color = fadecolor;
         }
+        isfading = false;
+        print(5);
     }
 
     private void CheckCamera()
     {
-        if (cam.transform.position.x + 7 < transform.position.x){cam.transform.position = new Vector3(cam.transform.position.x + 12, cam.transform.position.y, -10);}
-        else if (cam.transform.position.x - 7 > transform.position.x){cam.transform.position = new Vector3(cam.transform.position.x - 12, cam.transform.position.y, -10);}
+        if (cam.transform.position.x + 6.2f < transform.position.x){cam.transform.position = new Vector3(cam.transform.position.x + 12, cam.transform.position.y, -10); StartCoroutine("Fade"); }
+        else if (cam.transform.position.x - 6.2f > transform.position.x){cam.transform.position = new Vector3(cam.transform.position.x - 12, cam.transform.position.y, -10);StartCoroutine("Fade"); }
     }
 
     private void StartCooldown(float duration)
