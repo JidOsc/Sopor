@@ -9,7 +9,7 @@ public class ScriptUI : MonoBehaviour
     private short trashthrown;
     private string line = "";
 
-    private bool done = true;
+    public bool done = true;
 
     string[] lines = {
         "*Incoming call*",
@@ -39,7 +39,6 @@ public class ScriptUI : MonoBehaviour
 
         "FUCK-"
                      };
-
 
     private short linenumber;
 
@@ -79,7 +78,7 @@ public class ScriptUI : MonoBehaviour
 
         switch (trashthrown)
         {
-            case 2:
+            case 1:
                 StartCoroutine(Dialogue(1));
                 GameObject.Find("triggerzone").GetComponent<BoxCollider2D>().enabled = true;
                 stalker.transform.position = new Vector3(4.2f, 0.9f, 0f);

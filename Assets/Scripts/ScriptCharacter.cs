@@ -6,11 +6,14 @@ using UnityEngine.UI;
 public class ScriptCharacter : MonoBehaviour
 {
     public int speed = 1;
+
+    public int totaltrash = 4;
+    private int trashpicked = 0;
+
     public new Rigidbody2D rigidbody;
     public GameObject Canvas;
 
     private bool cooldown = false;
-    private bool carryingtrash = false;
     private bool opentrash = false;
     private bool colliding = false;
     private bool hidden = false;
@@ -21,7 +24,7 @@ public class ScriptCharacter : MonoBehaviour
     public GameObject fadebox;
     
 
- private void FixedUpdate()
+    private void FixedUpdate()
     {
         if (Input.GetKey(KeyCode.LeftShift))
         { speed = 6; }
@@ -29,7 +32,7 @@ public class ScriptCharacter : MonoBehaviour
         else if (speed != 3)
         { speed = 3; }
 
-        if (!hidden && !isfading)
+        if (!hidden && !isfading && GameObject.Find("Canvas").GetComponent<ScriptUI>().done)
         {
             if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
             { rigidbody.velocity = new Vector2(speed, 0); }
@@ -41,7 +44,10 @@ public class ScriptCharacter : MonoBehaviour
             { rigidbody.velocity = new Vector2(0, 0); }
         }
 
-        if(Input.GetKey(KeyCode.Space) && cooldown == false && colliding)
+        else
+            { rigidbody.velocity = new Vector2(0, 0); }
+
+        if (Input.GetKey(KeyCode.Space) && cooldown == false && colliding)
         {
             if (detectedobject.transform.name.StartsWith("Door"))
             { detectedobject.GetComponent<BoxCollider2D>().enabled = !detectedobject.GetComponent<BoxCollider2D>().enabled;
@@ -55,9 +61,9 @@ public class ScriptCharacter : MonoBehaviour
                 StartCooldown(0.4f);
             }
 
-            else if (detectedobject.transform.name.StartsWith("trash") && carryingtrash == false)
+            else if (detectedobject.transform.name.StartsWith("trash") && trashpicked != totaltrash)
             {
-                carryingtrash = true;
+                trashpicked += 1;
                 Destroy(detectedobject.gameObject);
 
                 StartCooldown(0.2f);
@@ -65,9 +71,9 @@ public class ScriptCharacter : MonoBehaviour
 
             else if (detectedobject.transform.name == "Trashcan")
             {
-                if (opentrash && carryingtrash)
+                if (opentrash && trashpicked == totaltrash)
                 {
-                    carryingtrash = false;
+                    trashpicked = 0;
                     print("slängde sopor");
 
                     Canvas.GetComponent<ScriptUI>().UpdateProgress(1);
@@ -105,7 +111,6 @@ public class ScriptCharacter : MonoBehaviour
                     StartCooldown(0.6f);
                     hidden = true;
                     GetComponent<SpriteRenderer>().enabled = false;
-                    GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
                 }
             }
         }
@@ -120,7 +125,6 @@ public class ScriptCharacter : MonoBehaviour
     IEnumerator Fade()
     {
         isfading = true;
-        GetComponent<Rigidbody2D>().velocity = new Vector2(0,0);
         Color fadecolor = fadebox.GetComponent<Image>().color;
         fadecolor.a = 1;
 
@@ -170,6 +174,7 @@ public class ScriptCharacter : MonoBehaviour
             GameObject.Find("Stalker").GetComponent<SpriteRenderer>().enabled = true;
         }
     }
+
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (detectedobject == collision.gameObject)
