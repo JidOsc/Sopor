@@ -16,32 +16,52 @@ public class ScriptCharacter : MonoBehaviour
     private bool cooldown = false;
     private bool opentrash = false;
     private bool colliding = false;
-    private bool hidden = false;
+    public bool hidden = false;
     private bool isfading = false;
 
     public GameObject cam;
     private GameObject detectedobject = null;
     public GameObject fadebox;
-    
+
+    Vector3[] rooms =
+    {
+        new Vector3(-4, 0, -10),
+        new Vector3(8, 0, -10)
+    };
+
+    private Vector3 currentroom;
+    private short roomnumber;
+
 
     private void FixedUpdate()
     {
         if (Input.GetKey(KeyCode.LeftShift))
-        { speed = 6; }
+        { speed = 4; }
 
-        else if (speed != 3)
-        { speed = 3; }
+        else if (speed != 2)
+        { speed = 2; }
 
         if (!hidden && !isfading && GameObject.Find("Canvas").GetComponent<ScriptUI>().done)
         {
             if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-            { rigidbody.velocity = new Vector2(speed, 0); }
+            { 
+                rigidbody.velocity = new Vector2(speed, 0);
+                GetComponent<SpriteRenderer>().flipX = false;
+                GetComponent<Animator>().SetBool("walking", true);
+            }
 
             else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-            { rigidbody.velocity = new Vector2(-speed, 0); }
+            { 
+                rigidbody.velocity = new Vector2(-speed, 0);
+                GetComponent<SpriteRenderer>().flipX = true;
+                GetComponent<Animator>().SetBool("walking", true);
+            }
 
             else
-            { rigidbody.velocity = new Vector2(0, 0); }
+            { 
+                rigidbody.velocity = new Vector2(0, 0);
+                GetComponent<Animator>().SetBool("walking", false);
+            }
         }
 
         else
@@ -65,6 +85,7 @@ public class ScriptCharacter : MonoBehaviour
             {
                 trashpicked += 1;
                 Destroy(detectedobject.gameObject);
+                GetComponent<Animator>().SetBool("carryingtrash", true);
 
                 StartCooldown(0.2f);
             }
@@ -75,6 +96,7 @@ public class ScriptCharacter : MonoBehaviour
                 {
                     trashpicked = 0;
                     print("slängde sopor");
+                    GetComponent<Animator>().SetBool("carryingtrash", false);
 
                     Canvas.GetComponent<ScriptUI>().UpdateProgress(1);
 
@@ -116,10 +138,27 @@ public class ScriptCharacter : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (currentroom.x - transform.position.x < 3f && currentroom.x - transform.position.x > -3f)
+        { 
+            //koden kollar om karaktären är längre än 3 enheter bort från mitten av rummet
+            //(specificerat i en lista längre upp och går på så sätt att utöka fritt)
+            //om den inte är det kommer kameran sättas på positionen av karaktären. På det sättet följer kameran karaktären fram tills ett visst avstånd från mitten
+
+            cam.transform.position = new Vector3(transform.position.x, 0, -10);
+        }
+    }
+
     private void Start()
     {
         StartCoroutine(Fade());
         InvokeRepeating("CheckCamera", 0.5f, 0.5f);
+
+        roomnumber = 0;
+        currentroom = rooms[roomnumber];
+        
+
     }
 
     IEnumerator Fade()
@@ -144,8 +183,26 @@ public class ScriptCharacter : MonoBehaviour
     private void CheckCamera()
     {
         //om karaktären är mer än 6.2 enheter bort från kamerans mittpunkt så kommer kameran flyttas 12 enheter i den riktningen
-        if (cam.transform.position.x + 6.2f < transform.position.x){cam.transform.position = new Vector3(cam.transform.position.x + 12, cam.transform.position.y, -10); StartCoroutine("Fade"); }
-        else if (cam.transform.position.x - 6.2f > transform.position.x){cam.transform.position = new Vector3(cam.transform.position.x - 12, cam.transform.position.y, -10);StartCoroutine("Fade"); }
+        if (currentroom.x + 6.2f < transform.position.x)
+        {
+            roomnumber += 1;
+            currentroom = rooms[roomnumber];
+
+            cam.transform.position = new Vector3(cam.transform.position.x + 6, 0, -10);
+
+            StartCoroutine("Fade");
+        }
+
+        else if (currentroom.x - 6.2f > transform.position.x)
+        {
+            //beroende på om karaktären rör sig till vänster eller höger så kommer det aktiva rummet också röra sig ditåt, viktigt för att veta kamerans relation
+            roomnumber -= 1;
+            currentroom = rooms[roomnumber];
+
+            cam.transform.position = new Vector3(cam.transform.position.x - 6, 0, -10);
+
+            StartCoroutine("Fade");
+        }
     }
 
     private void StartCooldown(float duration)
