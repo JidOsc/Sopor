@@ -20,10 +20,12 @@ public class ScriptCharacter : MonoBehaviour
     private bool isfading = false;
 
     public GameObject cam;
-    private GameObject detectedobject = null;
     public GameObject fadebox;
     public GameObject rainemitter;
     public GameObject jumpscare;
+
+    private List<GameObject> discoveredobjects = new List<GameObject> { };
+
 
     Vector3[] rooms =
     {
@@ -72,77 +74,88 @@ public class ScriptCharacter : MonoBehaviour
 
         if (colliding)
         {
-            if (detectedobject.transform.name == "STALKER" && !hidden)
+            if (discoveredobjects.Contains(GameObject.Find("STALKER")) && !hidden)
             {
                 GameOver();
             }
 
-            else if(Input.GetKey(KeyCode.E) && cooldown == false)
+            else if (Input.GetKey(KeyCode.E) && cooldown == false)
             {
-                if (detectedobject.transform.name.StartsWith("Door"))
-                { detectedobject.GetComponent<BoxCollider2D>().enabled = !detectedobject.GetComponent<BoxCollider2D>().enabled;
-
-                    //debug-kod, ska tas bort
-                    if (detectedobject.GetComponent<SpriteRenderer>().color == Color.white)
-                    { detectedobject.GetComponent<SpriteRenderer>().color = Color.red; }
-                    else
-                    { detectedobject.GetComponent<SpriteRenderer>().color = Color.white; }
-
-                    StartCooldown(0.4f);
-                }
-
-                else if (detectedobject.transform.name.StartsWith("trash") && trashpicked != totaltrash)
+                foreach (GameObject detectedobject in discoveredobjects)
                 {
-                    trashpicked += 1;
-                    Destroy(detectedobject.gameObject);
-                    GetComponent<Animator>().SetInteger("trash", trashpicked);
-
-                    StartCooldown(0.2f);
-                }
-
-                else if (detectedobject.transform.name == "Trashcan")
-                {
-                    if (opentrash && trashpicked == totaltrash)
+                    if (detectedobject.transform.name.StartsWith("Door"))
                     {
-                        trashpicked = 0;
-                        print("slängde sopor");
-                        GetComponent<Animator>().SetInteger("trash", 0);
-
-                        Canvas.GetComponent<ScriptUI>().UpdateProgress(1);
-
-                        StartCooldown(0.2f);
-                    }
-                    else
-                    {
-                        opentrash = !opentrash;
+                        detectedobject.GetComponent<BoxCollider2D>().enabled = !detectedobject.GetComponent<BoxCollider2D>().enabled;
 
                         //debug-kod, ska tas bort
-                        if (detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color == Color.red)
-                        { detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.white; }
+                        if (detectedobject.GetComponent<SpriteRenderer>().color == Color.white)
+                        { detectedobject.GetComponent<SpriteRenderer>().color = Color.red; }
                         else
-                        { detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.red; }
+                        { detectedobject.GetComponent<SpriteRenderer>().color = Color.white; }
 
-                        print("öppnade luckan");
+                        StartCooldown(0.4f);
+                        break;
+                    }
+
+                    else if (detectedobject.transform.name.StartsWith("trash") && trashpicked != totaltrash)
+                    {
+                        trashpicked += 1;
+
+                        discoveredobjects.Remove(detectedobject);
+                        Destroy(detectedobject.gameObject);
+
+                        GetComponent<Animator>().SetInteger("trash", trashpicked);
 
                         StartCooldown(0.2f);
-                    }
-                }
-
-                else if (detectedobject.transform.name.StartsWith("Wardrobe") && !cooldown)
-                {
-                    if (hidden)
-                    {
-
-                        StartCooldown(0.6f);
-                        hidden = false;
-                        GetComponent<SpriteRenderer>().enabled = true;
+                        break;
                     }
 
-                    else
+                    else if (detectedobject.transform.name == "Trashcan")
                     {
-                        StartCooldown(0.6f);
-                        hidden = true;
-                        GetComponent<SpriteRenderer>().enabled = false;
+                        if (opentrash && trashpicked == totaltrash)
+                        {
+                            trashpicked = 0;
+                            print("slängde sopor");
+                            GetComponent<Animator>().SetInteger("trash", 0);
+
+                            Canvas.GetComponent<ScriptUI>().UpdateProgress(1);
+
+                            StartCooldown(0.2f);
+                        }
+                        else
+                        {
+                            opentrash = !opentrash;
+
+                            //debug-kod, ska tas bort
+                            if (detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color == Color.red)
+                            { detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.white; }
+                            else
+                            { detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.red; }
+
+                            print("öppnade luckan");
+
+                            StartCooldown(0.2f);
+                        }
+                        break;
+                    }
+
+                    else if (detectedobject.transform.name.StartsWith("Wardrobe") && !cooldown)
+                    {
+                        if (hidden)
+                        {
+
+                            StartCooldown(0.6f);
+                            hidden = false;
+                            GetComponent<SpriteRenderer>().enabled = true;
+                        }
+
+                        else
+                        {
+                            StartCooldown(0.6f);
+                            hidden = true;
+                            GetComponent<SpriteRenderer>().enabled = false;
+                        }
+                        break;
                     }
                 }
             }
@@ -232,7 +245,7 @@ public class ScriptCharacter : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        detectedobject = collision.gameObject;
+        discoveredobjects.Add(collision.gameObject);
         colliding = true;
 
         if (collision.transform.name == "triggerzone")
@@ -243,10 +256,11 @@ public class ScriptCharacter : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (detectedobject == collision.gameObject)
+        discoveredobjects.Remove(collision.gameObject);
+
+        if (discoveredobjects.Count == 0)
         {
             colliding = false;
-            detectedobject = null;
         }
     }
 

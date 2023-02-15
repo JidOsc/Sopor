@@ -49,6 +49,7 @@ public class ScriptUI : MonoBehaviour
     public GameObject portraitluna;
     public GameObject portraitchar;
     public GameObject portraitstal;
+    public GameObject portraitphon;
     
     public GameObject character;
     public GameObject stalker;
@@ -58,9 +59,7 @@ public class ScriptUI : MonoBehaviour
     {
         trashthrown = 0;
 
-        portraitchar.SetActive(false);
-        portraitluna.SetActive(false);
-        portraitstal.SetActive(false);
+        HidePortraits();
 
         character = GameObject.Find("CHARACTER");
         stalker = GameObject.Find("Stalker");
@@ -179,6 +178,10 @@ public class ScriptUI : MonoBehaviour
                 break;
 
             case 3:
+                portraitphon.SetActive(true);
+                break;
+
+            case 4:
                 portraitstal.SetActive(true);
                 break;
         }
@@ -194,12 +197,18 @@ public class ScriptUI : MonoBehaviour
     {
         line = "";
 
-        portraitchar.SetActive(false);
-        portraitluna.SetActive(false);
-        portraitstal.SetActive(false);
+        HidePortraits();
 
         dialoguetext.GetComponent<TMP_Text>().text = "";
         done = true;
         skipped = false;
+    }
+
+    private void HidePortraits()
+    {
+        portraitchar.SetActive(false);
+        portraitluna.SetActive(false);
+        portraitstal.SetActive(false);
+        portraitphon.SetActive(false);
     }
 }
