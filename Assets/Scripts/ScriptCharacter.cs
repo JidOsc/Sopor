@@ -24,6 +24,9 @@ public class ScriptCharacter : MonoBehaviour
     public GameObject rainemitter;
     public GameObject jumpscare;
 
+    public AudioClip dooropens;
+    public AudioClip doorcloses;
+
     private List<GameObject> discoveredobjects = new List<GameObject> { };
 
 
@@ -46,7 +49,7 @@ public class ScriptCharacter : MonoBehaviour
         else if (speed != 2)
         { speed = 2; }
 
-        if (!hidden && !isfading && GameObject.Find("Canvas").GetComponent<ScriptUI>().done)
+        if (!hidden && !isfading && !GameObject.Find("Canvas").GetComponent<ScriptUI>().importantdialogue)
         {
             if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
             { 
@@ -85,13 +88,19 @@ public class ScriptCharacter : MonoBehaviour
                 {
                     if (detectedobject.transform.name.StartsWith("Door"))
                     {
-                        detectedobject.GetComponent<BoxCollider2D>().enabled = !detectedobject.GetComponent<BoxCollider2D>().enabled;
+                        AudioSource audio = detectedobject.GetComponent<AudioSource>();
 
-                        //debug-kod, ska tas bort
-                        if (detectedobject.GetComponent<SpriteRenderer>().color == Color.white)
-                        { detectedobject.GetComponent<SpriteRenderer>().color = Color.red; }
+                        if (detectedobject.GetComponent<BoxCollider2D>().enabled)
+                        {
+                            audio.PlayOneShot(dooropens);
+                            detectedobject.GetComponent<BoxCollider2D>().enabled = false;
+                        }
+
                         else
-                        { detectedobject.GetComponent<SpriteRenderer>().color = Color.white; }
+                        {
+                            audio.PlayOneShot(doorcloses);
+                            detectedobject.GetComponent<BoxCollider2D>().enabled = true;
+                        }
 
                         StartCooldown(0.4f);
                         break;
@@ -100,6 +109,21 @@ public class ScriptCharacter : MonoBehaviour
                     else if (detectedobject.transform.name.StartsWith("trash") && trashpicked != totaltrash)
                     {
                         trashpicked += 1;
+
+                        switch(trashpicked)
+                        {
+                            case 1:
+                                Canvas.GetComponent<ScriptUI>().UpdateProgress(2);
+                                break;
+
+                            case 3:
+                                Canvas.GetComponent<ScriptUI>().UpdateProgress(3);
+                                break;
+
+                            case 5:
+                                Canvas.GetComponent<ScriptUI>().UpdateProgress(4);
+                                break;
+                        }
 
                         discoveredobjects.Remove(detectedobject);
                         Destroy(detectedobject.gameObject);
@@ -117,8 +141,6 @@ public class ScriptCharacter : MonoBehaviour
                             trashpicked = 0;
                             print("slängde sopor");
                             GetComponent<Animator>().SetInteger("trash", 0);
-
-                            Canvas.GetComponent<ScriptUI>().UpdateProgress(1);
 
                             StartCooldown(0.2f);
                         }
@@ -155,6 +177,13 @@ public class ScriptCharacter : MonoBehaviour
                             hidden = true;
                             GetComponent<SpriteRenderer>().enabled = false;
                         }
+                        break;
+                    }
+
+                    else if (detectedobject.transform.name == "Speaker" && !cooldown)
+                    {
+
+                        StartCooldown(0.6f);
                         break;
                     }
                 }
