@@ -22,11 +22,14 @@ public class ScriptCharacter : MonoBehaviour
     public GameObject cam;
     private GameObject detectedobject = null;
     public GameObject fadebox;
+    public GameObject rainemitter;
+    public GameObject jumpscare;
 
     Vector3[] rooms =
     {
         new Vector3(-4, 0, -10),
-        new Vector3(8, 0, -10)
+        new Vector3(8, 0, -10),
+        new Vector3(20, 0, -10)
     };
 
     private Vector3 currentroom;
@@ -67,72 +70,80 @@ public class ScriptCharacter : MonoBehaviour
         else
             { rigidbody.velocity = new Vector2(0, 0); }
 
-        if (Input.GetKey(KeyCode.Space) && cooldown == false && colliding)
+        if (colliding)
         {
-            if (detectedobject.transform.name.StartsWith("Door"))
-            { detectedobject.GetComponent<BoxCollider2D>().enabled = !detectedobject.GetComponent<BoxCollider2D>().enabled;
+            if (detectedobject.transform.name == "STALKER" && !hidden)
+            {
+                GameOver();
+            }
 
-                //debug-kod, ska tas bort
+            else if(Input.GetKey(KeyCode.E) && cooldown == false)
+            {
+                if (detectedobject.transform.name.StartsWith("Door"))
+                { detectedobject.GetComponent<BoxCollider2D>().enabled = !detectedobject.GetComponent<BoxCollider2D>().enabled;
+
+                    //debug-kod, ska tas bort
                     if (detectedobject.GetComponent<SpriteRenderer>().color == Color.white)
                     { detectedobject.GetComponent<SpriteRenderer>().color = Color.red; }
                     else
                     { detectedobject.GetComponent<SpriteRenderer>().color = Color.white; }
 
-                StartCooldown(0.4f);
-            }
+                    StartCooldown(0.4f);
+                }
 
-            else if (detectedobject.transform.name.StartsWith("trash") && trashpicked != totaltrash)
-            {
-                trashpicked += 1;
-                Destroy(detectedobject.gameObject);
-                GetComponent<Animator>().SetBool("carryingtrash", true);
-
-                StartCooldown(0.2f);
-            }
-
-            else if (detectedobject.transform.name == "Trashcan")
-            {
-                if (opentrash && trashpicked == totaltrash)
+                else if (detectedobject.transform.name.StartsWith("trash") && trashpicked != totaltrash)
                 {
-                    trashpicked = 0;
-                    print("slängde sopor");
-                    GetComponent<Animator>().SetBool("carryingtrash", false);
-
-                    Canvas.GetComponent<ScriptUI>().UpdateProgress(1);
+                    trashpicked += 1;
+                    Destroy(detectedobject.gameObject);
+                    GetComponent<Animator>().SetInteger("trash", trashpicked);
 
                     StartCooldown(0.2f);
                 }
-                else
-                {
-                    opentrash = !opentrash;
 
-                    //debug-kod, ska tas bort
+                else if (detectedobject.transform.name == "Trashcan")
+                {
+                    if (opentrash && trashpicked == totaltrash)
+                    {
+                        trashpicked = 0;
+                        print("slängde sopor");
+                        GetComponent<Animator>().SetInteger("trash", 0);
+
+                        Canvas.GetComponent<ScriptUI>().UpdateProgress(1);
+
+                        StartCooldown(0.2f);
+                    }
+                    else
+                    {
+                        opentrash = !opentrash;
+
+                        //debug-kod, ska tas bort
                         if (detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color == Color.red)
                         { detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.white; }
                         else
                         { detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.red; }
 
-                    print("öppnade luckan");
+                        print("öppnade luckan");
 
-                    StartCooldown(0.2f);
-                }
-            }
-
-            else if (detectedobject.transform.name.StartsWith("Wardrobe") && !cooldown)
-            {
-                if(hidden)
-                {
-
-                    StartCooldown(0.6f);
-                    hidden = false;
-                    GetComponent<SpriteRenderer>().enabled = true;
+                        StartCooldown(0.2f);
+                    }
                 }
 
-                else
+                else if (detectedobject.transform.name.StartsWith("Wardrobe") && !cooldown)
                 {
-                    StartCooldown(0.6f);
-                    hidden = true;
-                    GetComponent<SpriteRenderer>().enabled = false;
+                    if (hidden)
+                    {
+
+                        StartCooldown(0.6f);
+                        hidden = false;
+                        GetComponent<SpriteRenderer>().enabled = true;
+                    }
+
+                    else
+                    {
+                        StartCooldown(0.6f);
+                        hidden = true;
+                        GetComponent<SpriteRenderer>().enabled = false;
+                    }
                 }
             }
         }
@@ -141,11 +152,12 @@ public class ScriptCharacter : MonoBehaviour
     private void Update()
     {
         if (currentroom.x - transform.position.x < 3f && currentroom.x - transform.position.x > -3f)
-        { 
+        {
             //koden kollar om karaktären är längre än 3 enheter bort från mitten av rummet
             //(specificerat i en lista längre upp och går på så sätt att utöka fritt)
             //om den inte är det kommer kameran sättas på positionen av karaktären. På det sättet följer kameran karaktären fram tills ett visst avstånd från mitten
 
+            rainemitter.transform.position = new Vector3(transform.position.x, 2, 0);
             cam.transform.position = new Vector3(transform.position.x, 0, -10);
         }
     }
@@ -223,9 +235,6 @@ public class ScriptCharacter : MonoBehaviour
         detectedobject = collision.gameObject;
         colliding = true;
 
-        GameObject.Find("popupSpace").transform.position = new Vector3(collision.transform.position.x, collision.transform.position.y + 1.5f, -1);
-        GameObject.Find("popupSpace").GetComponent<SpriteRenderer>().enabled = true;
-
         if (collision.transform.name == "triggerzone")
         {
             GameObject.Find("Stalker").GetComponent<SpriteRenderer>().enabled = true;
@@ -238,7 +247,11 @@ public class ScriptCharacter : MonoBehaviour
         {
             colliding = false;
             detectedobject = null;
-            GameObject.Find("popupSpace").GetComponent<SpriteRenderer>().enabled = false;
         }
+    }
+
+    public void GameOver()
+    {
+        jumpscare.SetActive(true);
     }
 }

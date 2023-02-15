@@ -8,6 +8,8 @@ public class ScriptUI : MonoBehaviour
 {
     private short trashthrown;
     private string line = "";
+    private bool skipped = false;
+    private bool activedialogue = false;
 
     public bool done = true;
 
@@ -68,7 +70,11 @@ public class ScriptUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if(Input.GetKeyDown(KeyCode.Space) && activedialogue)
+        {
+            skipped = true;
+            dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters = line.Length;
+        }
     }
 
     public void UpdateProgress(short trashpicked)
@@ -98,6 +104,11 @@ public class ScriptUI : MonoBehaviour
     {
         while (dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters < line.Length)
         {
+            if(skipped)
+            {
+                break;
+            }
+
             yield return new WaitForSeconds(0.07f);
             dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters += 1;
         }
@@ -109,6 +120,7 @@ public class ScriptUI : MonoBehaviour
         switch(convo)
         {
             case 1:
+                activedialogue = true;
                 done = false;   ShowDialogue(lines[0], 3);  while (!done) { yield return null; }
 
                 done = false;   ShowDialogue(lines[1], 2);  while (!done) { yield return null; }
@@ -136,18 +148,20 @@ public class ScriptUI : MonoBehaviour
                 done = false;   ShowDialogue(lines[12], 1); while (!done) { yield return null; }
 
                 done = false;   ShowDialogue(lines[13], 3); while (!done) { yield return null; }
-
+                activedialogue = false;
                 break;
 
 
             case 2:
+                activedialogue = true;
                 done = false; ShowDialogue(lines[14], 1); while (!done) { yield return null; }
-
+                activedialogue = false;
                 break;
 
             case 3:
+                activedialogue = true;
                 done = false; ShowDialogue(lines[15], 1); while (!done) { yield return null; }
-
+                activedialogue = false;
                 break;
         }
     }
@@ -186,5 +200,6 @@ public class ScriptUI : MonoBehaviour
 
         dialoguetext.GetComponent<TMP_Text>().text = "";
         done = true;
+        skipped = false;
     }
 }
