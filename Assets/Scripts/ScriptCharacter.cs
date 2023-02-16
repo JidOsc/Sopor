@@ -182,7 +182,7 @@ public class ScriptCharacter : MonoBehaviour
 
                     else if (detectedobject.transform.name == "Speaker" && !cooldown)
                     {
-
+                        detectedobject.GetComponent<AudioSource>().Play();
                         StartCooldown(0.6f);
                         break;
                     }
