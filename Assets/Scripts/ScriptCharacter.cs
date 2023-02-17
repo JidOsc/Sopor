@@ -170,6 +170,7 @@ public class ScriptCharacter : MonoBehaviour
 
                                 case 9:
                                     door.GetComponent<BoxCollider2D>().enabled = true;
+                                    detectedobject.GetComponent<SpriteRenderer>().sprite = doorclosed;
                                     door.GetComponent<AudioSource>().PlayOneShot(doorcloses);
                                     break;
 
@@ -279,8 +280,6 @@ public class ScriptCharacter : MonoBehaviour
 
         roomnumber = 1;
         currentroom = rooms[roomnumber];
-        
-
     }
 
     IEnumerator Fade()
@@ -426,6 +425,7 @@ public class ScriptCharacter : MonoBehaviour
 
         if (collision.gameObject.name == "Wardrobe" && stage == 3)
         {
+            print("usch");
             Canvas.GetComponent<ScriptUI>().UpdateProgress(6);
         }
 

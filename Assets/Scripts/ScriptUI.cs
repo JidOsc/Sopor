@@ -122,6 +122,7 @@ public class ScriptUI : MonoBehaviour
                 break;
 
             case 6:
+                print("rutger");
                 StartCoroutine(Dialogue(7));
                 break;
 
