@@ -13,6 +13,7 @@ public class ScriptUI : MonoBehaviour
     public bool importantdialogue = false;
     public bool done = true;
 
+    //lista över all dialog i spelet
     string[] lines = {
         "I should turn on the speakers.",
 
@@ -41,6 +42,8 @@ public class ScriptUI : MonoBehaviour
         "I guess it's about time we cleaned this out...",
         "Jesus, this looks like shit...",
 
+        "I need to throw this trash bag into the bin outside",
+
         "What was that?",
 
         "You already home?",
@@ -50,15 +53,13 @@ public class ScriptUI : MonoBehaviour
         "FUCK-"
                      };
 
-    private short linenumber;
-
     public GameObject dialoguetext;
 
     public GameObject portraitluna;
     public GameObject portraitchar;
     public GameObject portraitstal;
     public GameObject portraitphon;
-    
+
     public GameObject character;
     public GameObject stalker;
 
@@ -70,7 +71,7 @@ public class ScriptUI : MonoBehaviour
         HidePortraits();
 
         character = GameObject.Find("CHARACTER");
-        stalker = GameObject.Find("Stalker");
+        stalker = GameObject.Find("STALKER");
         
     }
 
@@ -90,8 +91,6 @@ public class ScriptUI : MonoBehaviour
         {
             case 1:
                 StartCoroutine(Dialogue(2));
-                GameObject.Find("triggerzone").GetComponent<BoxCollider2D>().enabled = true;
-                stalker.transform.position = new Vector3(4.2f, 0.9f, 0f);
                 break;
 
             case 2:
@@ -104,6 +103,10 @@ public class ScriptUI : MonoBehaviour
 
             case 4:
                 StartCoroutine(Dialogue(5));
+                break;
+
+            case 5:
+                StartCoroutine(Dialogue(6));
                 break;
 
         }
@@ -137,6 +140,7 @@ public class ScriptUI : MonoBehaviour
                 break;
 
             case 2:
+                yield return new WaitForSeconds(3);
                 activedialogue = importantdialogue = true;
 
                 done = false;   ShowDialogue(lines[1], 3);  while (!done) { yield return null; }
@@ -161,7 +165,15 @@ public class ScriptUI : MonoBehaviour
 
                 done = false;   ShowDialogue(lines[11], 1); while (!done) { yield return null; }
 
-                done = false;   ShowDialogue(lines[12], 2); while (!done) { yield return null; }
+                done = false;   ShowDialogue(lines[12], 2); while (!done) {
+                    while (stalker.transform.position.x < 14)
+                    {
+                        stalker.GetComponent<Rigidbody2D>().velocity = new Vector2(4, 0);
+                        yield return new WaitForSeconds(0.1f);
+                    }
+                    yield return null; }
+
+                
 
                 done = false;   ShowDialogue(lines[13], 0); while (!done) { yield return null; }
 
@@ -203,11 +215,17 @@ public class ScriptUI : MonoBehaviour
 
             case 6:
                 activedialogue = true;
-                done = false; ShowDialogue(lines[24], 1); while (!done) { yield return null; }
+                done = false; ShowDialogue(lines[24], 0); while (!done) { yield return null; }
+                activedialogue = false;
+                break;
 
-                done = false; ShowDialogue(lines[25], 0); while (!done) { yield return null; }
+            case 7:
+                activedialogue = true;
+                done = false; ShowDialogue(lines[25], 1); while (!done) { yield return null; }
 
-                done = false; ShowDialogue(lines[26], 1); while (!done) { yield return null; }
+                done = false; ShowDialogue(lines[26], 0); while (!done) { yield return null; }
+
+                done = false; ShowDialogue(lines[27], 1); while (!done) { yield return null; }
 
                 activedialogue = false;
                 break;

@@ -5,6 +5,7 @@ using UnityEngine;
 public class ScriptStalker : MonoBehaviour
 {
     private bool cooldown = false;
+    public bool active = false;
 
     private Vector2 direction = Vector2.right;
 
@@ -19,33 +20,37 @@ public class ScriptStalker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        //GetComponent<SpriteRenderer>().sortingOrder = 0;
+        //GetComponent<SpriteRenderer>().color = Color.white;
     }
 
     private void FixedUpdate()
     {
-        if (SeesPlayer() && !Character.GetComponent<ScriptCharacter>().hidden)
+        if (active)
         {
-            print("karaktär");
-            GetComponent<Rigidbody2D>().velocity = new Vector2(DirToCharacter() * huntspeed, 0);
-        }
-
-        else if (!cooldown)
-        {
-            switch (Random.Range(1, 3))
+            if (SeesPlayer() && !Character.GetComponent<ScriptCharacter>().hidden)
             {
-                case 1:
-                    direction = Vector2.right;
-                    GetComponent<Rigidbody2D>().velocity = Vector2.right * 3;
-                    break;
-
-                case 2:
-                    direction = Vector2.left;
-                    GetComponent<Rigidbody2D>().velocity = Vector2.left * 3;
-                    break;
+                print("karaktär");
+                GetComponent<Rigidbody2D>().velocity = new Vector2(DirToCharacter() * huntspeed, 0);
             }
-            cooldown = true;
-            Invoke("Cooldown", 0.7f);
+
+            else if (!cooldown)
+            {
+                switch (Random.Range(1, 3))
+                {
+                    case 1:
+                        direction = Vector2.right;
+                        GetComponent<Rigidbody2D>().velocity = Vector2.right * 3;
+                        break;
+
+                    case 2:
+                        direction = Vector2.left;
+                        GetComponent<Rigidbody2D>().velocity = Vector2.left * 3;
+                        break;
+                }
+                cooldown = true;
+                Invoke("Cooldown", 0.7f);
+            }
         }
     }
 
