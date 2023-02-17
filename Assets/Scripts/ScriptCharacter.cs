@@ -37,12 +37,19 @@ public class ScriptCharacter : MonoBehaviour
     public GameObject rainemitter;
     public GameObject jumpscare;
     public GameObject door;
+    public GameObject stalker;
 
     public GameObject tutorial1;
     public GameObject tutorial2;
 
     public AudioClip dooropens;
     public AudioClip doorcloses;
+
+    public Sprite doorclosed;
+    public Sprite dooropen;
+
+    public Sprite trashcanclosed;
+    public Sprite trashcanopen;
 
     public AudioClip trashcanopens;
     public AudioClip trashcancloses;
@@ -71,11 +78,11 @@ public class ScriptCharacter : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (Input.GetKey(KeyCode.LeftShift))
-        { speed = 4; }
+        //if (Input.GetKey(KeyCode.LeftShift))
+        //{ speed = 4; }
 
-        else if (speed != 2)
-        { speed = 2; }
+        //else if (speed != 2)
+        //{ speed = 2; }
 
         if (!hidden && !isfading && !GameObject.Find("Canvas").GetComponent<ScriptUI>().importantdialogue)
         {
@@ -104,7 +111,10 @@ public class ScriptCharacter : MonoBehaviour
         }
 
         else
-            { rigidbody.velocity = new Vector2(0, 0); }
+        {
+            GetComponent<Animator>().SetBool("walking", false);
+            rigidbody.velocity = new Vector2(0, 0); 
+        }
 
         if (colliding)
         {
@@ -123,12 +133,16 @@ public class ScriptCharacter : MonoBehaviour
 
                         if (detectedobject.GetComponent<BoxCollider2D>().enabled)
                         {
+                            detectedobject.GetComponent<SpriteRenderer>().sprite = dooropen;
+                            detectedobject.GetComponent<SpriteRenderer>().sortingOrder = 1;
                             audio.PlayOneShot(dooropens);
                             detectedobject.GetComponent<BoxCollider2D>().enabled = false;
                         }
 
                         else
                         {
+                            detectedobject.GetComponent<SpriteRenderer>().sprite = doorclosed;
+                            detectedobject.GetComponent<SpriteRenderer>().sortingOrder = -1;
                             audio.PlayOneShot(doorcloses);
                             detectedobject.GetComponent<BoxCollider2D>().enabled = true;
                         }
@@ -151,14 +165,19 @@ public class ScriptCharacter : MonoBehaviour
                                     break;
 
                                 case 5:
-                                    door.GetComponent<BoxCollider2D>().enabled = true;
-                                    door.GetComponent<AudioSource>().PlayOneShot(doorcloses);
                                     Canvas.GetComponent<ScriptUI>().UpdateProgress(3);
                                     break;
 
-                                case 8:
-                                    Canvas.GetComponent<ScriptUI>().UpdateProgress(4);
+                                case 9:
+                                    door.GetComponent<BoxCollider2D>().enabled = true;
+                                    door.GetComponent<AudioSource>().PlayOneShot(doorcloses);
+                                    break;
+
+                                case 12:
+                                    stalker.transform.position = new Vector3(10, -0.25f, 0);
                                     stage = 3;
+
+                                    Canvas.GetComponent<ScriptUI>().UpdateProgress(4);
                                     break;
                             }
 
@@ -190,19 +209,11 @@ public class ScriptCharacter : MonoBehaviour
                         }
                         else
                         {
-                            if(opentrash)   {detectedobject.GetComponent<AudioSource>().PlayOneShot(trashcancloses);}
+                            if(opentrash)   {detectedobject.GetComponent<AudioSource>().PlayOneShot(trashcancloses); detectedobject.GetComponent<SpriteRenderer>().sprite = trashcanclosed; }
 
-                            else            {detectedobject.GetComponent<AudioSource>().PlayOneShot(trashcanopens);}
+                            else            {detectedobject.GetComponent<AudioSource>().PlayOneShot(trashcanopens); detectedobject.GetComponent<SpriteRenderer>().sprite = trashcanopen; }
 
                             opentrash = !opentrash;
-
-                            //debug-kod, ska tas bort
-                            if (detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color == Color.red)
-                            { detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.white; }
-                            else
-                            { detectedobject.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.red; }
-
-                            print("öppnade luckan");
 
                             StartCooldown(0.2f);
                         }
@@ -265,7 +276,6 @@ public class ScriptCharacter : MonoBehaviour
         InvokeRepeating("CheckCamera", 0.5f, 0.5f);
 
         stage = 0;
-        tutorial1.SetActive(true);
 
         roomnumber = 1;
         currentroom = rooms[roomnumber];
@@ -334,6 +344,9 @@ public class ScriptCharacter : MonoBehaviour
     {
         if (!footcooldown)
         {
+            //varje gång cooldownen har löpt ut kommer ett ljud spelas. Ljudet beror på om man är till vänster eller höger om position x = 2
+            //till vänster är utomhus, höger är inomhus. Sedan finns det 6 olika ljud för de olika miljöerna som körs i en lista efter varandra
+            //så att det blir lite variation och inte samma ljud hela tiden
             footstep++;
             if (transform.position.x < 2)
             {
@@ -408,8 +421,15 @@ public class ScriptCharacter : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
+        //plocka bort objektet som man lämnar ur listan
         discoveredobjects.Remove(collision.gameObject);
 
+        if (collision.gameObject.name == "Wardrobe" && stage == 3)
+        {
+            Canvas.GetComponent<ScriptUI>().UpdateProgress(6);
+        }
+
+        //om listan är tom så kolliderar inte karaktären längre
         if (discoveredobjects.Count == 0)
         {
             colliding = false;

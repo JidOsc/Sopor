@@ -15,8 +15,10 @@ public class ScriptUI : MonoBehaviour
 
     //lista över all dialog i spelet
     string[] lines = {
+        //introduktion
         "I should turn on the speakers.",
 
+        //samtal
         "*Incoming call*",
         "For fuck sake, what is it now...",
         "Hey cutie, I'm like- stuck in traffic with a bunch of groceries!",
@@ -38,18 +40,26 @@ public class ScriptUI : MonoBehaviour
         "Call ends.",
         "I guess it wouldn’t hurt to clean… but did it really have to be now?",
 
+        //olika monologer för när man plockar upp skräp
         "Ew, this stinks",
         "I guess it's about time we cleaned this out...",
         "Jesus, this looks like shit...",
 
+        //när man försöker plocka upp mer än som får plats i soppåsen
         "I need to throw this trash bag into the bin outside",
 
+        //man ser stalkern utanför fönstret
         "What was that?",
 
+        //dörren stängs och man hör fotsteg
         "You already home?",
         "...",
         "Hello? ...Luna?",
 
+        //lite senare
+        "Someone is inside the house. I should hide in the wardrobe",
+
+        //man ser stalkern för första gången
         "FUCK-"
                      };
 
@@ -59,6 +69,8 @@ public class ScriptUI : MonoBehaviour
     public GameObject portraitchar;
     public GameObject portraitstal;
     public GameObject portraitphon;
+
+    public GameObject tutorial1;
 
     public GameObject character;
     public GameObject stalker;
@@ -109,6 +121,10 @@ public class ScriptUI : MonoBehaviour
                 StartCoroutine(Dialogue(6));
                 break;
 
+            case 6:
+                StartCoroutine(Dialogue(7));
+                break;
+
         }
     }
 
@@ -132,14 +148,19 @@ public class ScriptUI : MonoBehaviour
         switch(convo)
         {
             case 1:
+                //introduktion
                 activedialogue = importantdialogue = true;
 
                 done = false; ShowDialogue(lines[0], 0); while (!done) { yield return null; }
+
+                yield return new WaitForSeconds(1);
+                tutorial1.SetActive(true);
 
                 activedialogue = importantdialogue = false;
                 break;
 
             case 2:
+                //telefonsamtal
                 yield return new WaitForSeconds(3);
                 activedialogue = importantdialogue = true;
 
@@ -171,6 +192,7 @@ public class ScriptUI : MonoBehaviour
                         stalker.GetComponent<Rigidbody2D>().velocity = new Vector2(4, 0);
                         yield return new WaitForSeconds(0.1f);
                     }
+                    stalker.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
                     yield return null; }
 
                 
@@ -196,30 +218,47 @@ public class ScriptUI : MonoBehaviour
 
 
             case 3:
+                //plocka sopor 1
                 activedialogue = true;
                 done = false; ShowDialogue(lines[21], 0); while (!done) { yield return null; }
                 activedialogue = false;
                 break;
 
             case 4:
+                //plocka sopor 2
                 activedialogue = true;
                 done = false; ShowDialogue(lines[22], 0); while (!done) { yield return null; }
                 activedialogue = false;
                 break;
 
             case 5:
+                //plocka sopor 3
                 activedialogue = true;
                 done = false; ShowDialogue(lines[23], 0); while (!done) { yield return null; }
                 activedialogue = false;
                 break;
 
             case 6:
+                //plocka upp för mycket
                 activedialogue = true;
                 done = false; ShowDialogue(lines[24], 0); while (!done) { yield return null; }
                 activedialogue = false;
                 break;
 
             case 7:
+                //stalker syns utanför fönster kort, 12 sopor totalt + går förbi garderoben
+                done = false; ShowDialogue(lines[25], 1); while (!done) {
+                    while (stalker.transform.position.x < 14)
+                    {
+                        stalker.GetComponent<Rigidbody2D>().velocity = new Vector2(5, 0);
+                        yield return new WaitForSeconds(0.1f);
+                    }
+                    stalker.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+                    yield return null; }
+                break;
+
+            case 8:
+                //13 sopan
                 activedialogue = true;
                 done = false; ShowDialogue(lines[25], 1); while (!done) { yield return null; }
 
@@ -229,6 +268,16 @@ public class ScriptUI : MonoBehaviour
 
                 activedialogue = false;
                 break;
+
+            case 9:
+                //stalker är i huset
+                break;
+
+            case 10:
+                //man ser stalkern för första gången
+                break;
+
+
         }
     }
 
