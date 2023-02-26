@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class ScriptUI : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class ScriptUI : MonoBehaviour
 
     public bool importantdialogue = false;
     public bool done = true;
+
+    public bool skipcall;
 
     //lista över all dialog i spelet
     string[] lines = {
@@ -55,12 +58,14 @@ public class ScriptUI : MonoBehaviour
         "You already home?",
         "...",
         "Hello? ...Luna?",
-
-        //lite senare
         "Someone is inside the house. I should hide in the wardrobe",
 
         //man ser stalkern för första gången
-        "FUCK-"
+        "FUCK-",
+        "I need to get out of here.",
+        "There's a bush I can hide in outdoors.",
+        "Just need to wait for the right moment..."
+
                      };
 
     public GameObject dialoguetext;
@@ -69,6 +74,8 @@ public class ScriptUI : MonoBehaviour
     public GameObject portraitchar;
     public GameObject portraitstal;
     public GameObject portraitphon;
+
+    public GameObject winzone;
 
     public GameObject tutorial1;
 
@@ -99,34 +106,7 @@ public class ScriptUI : MonoBehaviour
 
     public void UpdateProgress(short stage)
     {
-        switch (stage)
-        {
-            case 1:
-                StartCoroutine(Dialogue(2));
-                break;
-
-            case 2:
-                StartCoroutine(Dialogue(3));
-                break;
-
-            case 3:
-                StartCoroutine(Dialogue(4));
-                break;
-
-            case 4:
-                StartCoroutine(Dialogue(5));
-                break;
-
-            case 5:
-                StartCoroutine(Dialogue(6));
-                break;
-
-            case 6:
-                print("rutger");
-                StartCoroutine(Dialogue(7));
-                break;
-
-        }
+        StartCoroutine(Dialogue(stage));
     }
 
     IEnumerator RevealText()
@@ -161,62 +141,66 @@ public class ScriptUI : MonoBehaviour
                 break;
 
             case 2:
-                //telefonsamtal
-                yield return new WaitForSeconds(3);
-                activedialogue = importantdialogue = true;
+                if (!skipcall)
+                {
+                    //telefonsamtal
+                    yield return new WaitForSeconds(3);
+                    activedialogue = importantdialogue = true;
 
-                done = false;   ShowDialogue(lines[1], 3);  while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[1], 3); while (!done) { yield return null; }
 
-                done = false;   ShowDialogue(lines[2], 0);  while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[2], 0); while (!done) { yield return null; }
 
-                done = false;   ShowDialogue(lines[3], 2);  while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[3], 2); while (!done) { yield return null; }
 
-                done = false;   ShowDialogue(lines[4], 0);  while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[4], 0); while (!done) { yield return null; }
 
-                done = false;   ShowDialogue(lines[5], 1);  while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[5], 1); while (!done) { yield return null; }
 
-                done = false;   ShowDialogue(lines[6], 2);  while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[6], 2); while (!done) { yield return null; }
 
-                done = false;   ShowDialogue(lines[7], 0);  while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[7], 0); while (!done) { yield return null; }
 
-                done = false;   ShowDialogue(lines[8], 1);  while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[8], 1); while (!done) { yield return null; }
 
-                done = false;   ShowDialogue(lines[9], 2);  while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[9], 2); while (!done) { yield return null; }
 
-                done = false;   ShowDialogue(lines[10], 0); while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[10], 0); while (!done) { yield return null; }
 
-                done = false;   ShowDialogue(lines[11], 1); while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[11], 1); while (!done) { yield return null; }
 
-                done = false;   ShowDialogue(lines[12], 2); while (!done) {
-                    while (stalker.transform.position.x < 14)
+                    done = false; ShowDialogue(lines[12], 2); while (!done)
                     {
-                        stalker.GetComponent<Rigidbody2D>().velocity = new Vector2(4, 0);
-                        yield return new WaitForSeconds(0.1f);
+                        while (stalker.transform.position.x < 14)
+                        {
+                            stalker.GetComponent<Rigidbody2D>().velocity = new Vector2(4, 0);
+                            yield return new WaitForSeconds(0.1f);
+                        }
+                        stalker.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+                        yield return null;
                     }
-                    stalker.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
-                    yield return null; }
 
-                
+                    stalker.GetComponent<SpriteRenderer>().color = Color.white;
 
-                done = false;   ShowDialogue(lines[13], 0); while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[13], 0); while (!done) { yield return null; }
 
-                done = false; ShowDialogue(lines[14], 1); while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[14], 1); while (!done) { yield return null; }
 
-                done = false; ShowDialogue(lines[15], 2); while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[15], 2); while (!done) { yield return null; }
 
-                done = false; ShowDialogue(lines[16], 1); while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[16], 1); while (!done) { yield return null; }
 
-                done = false; ShowDialogue(lines[17], 2); while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[17], 2); while (!done) { yield return null; }
 
-                done = false; ShowDialogue(lines[18], 1); while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[18], 1); while (!done) { yield return null; }
 
-                done = false; ShowDialogue(lines[19], 3); while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[19], 3); while (!done) { yield return null; }
 
-                done = false; ShowDialogue(lines[20], 0); while (!done) { yield return null; }
+                    done = false; ShowDialogue(lines[20], 0); while (!done) { yield return null; }
 
-                activedialogue = importantdialogue = false;
+                    activedialogue = importantdialogue = false;
+                }
                 break;
-
 
             case 3:
                 //plocka sopor 1
@@ -261,23 +245,51 @@ public class ScriptUI : MonoBehaviour
             case 8:
                 //13 sopan
                 activedialogue = true;
-                done = false; ShowDialogue(lines[25], 1); while (!done) { yield return null; }
+                importantdialogue = true;
+                done = false; ShowDialogue(lines[26], 1); while (!done) { yield return null; }
 
-                done = false; ShowDialogue(lines[26], 0); while (!done) { yield return null; }
+                done = false; ShowDialogue(lines[27], 0); while (!done) { yield return null; }
 
-                done = false; ShowDialogue(lines[27], 1); while (!done) { yield return null; }
+                done = false; ShowDialogue(lines[28], 1); while (!done) { yield return null; }
+
+                done = false; ShowDialogue(lines[29], 0); while (!done) { yield return null; }
 
                 activedialogue = false;
+                importantdialogue = false;
+                character.GetComponent<ScriptCharacter>().stage = 4;
                 break;
 
             case 9:
-                //stalker är i huset
-                break;
+                stalker.GetComponent<SpriteRenderer>().sortingOrder = 0;
+                stalker.transform.position = new Vector2(0, -0.25f);
+                stalker.GetComponent<Rigidbody2D>().velocity = new Vector2(3, 0);
+                yield return new WaitForSeconds(2);
 
-            case 10:
-                //man ser stalkern för första gången
-                break;
+                importantdialogue = true;
+                activedialogue = true;
+                done = false; ShowDialogue(lines[30], 0); while (!done) { yield return null; }
 
+                done = false; ShowDialogue(lines[31], 0); while (!done)
+                {
+                    while (stalker.transform.position.x < 10)
+                    {
+                        yield return new WaitForSeconds(0.1f);
+                    }
+                    yield return null;
+                }
+
+                stalker.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+                stalker.GetComponent<ScriptStalker>().active = true;
+                character.GetComponent<ScriptCharacter>().stage = 5;
+                winzone.SetActive(true);
+
+                done = false; ShowDialogue(lines[32], 0); while (!done) { yield return null; }
+
+                done = false; ShowDialogue(lines[33], 0); while (!done) { yield return null; }
+
+                activedialogue = false;
+                importantdialogue = false;
+                break;
 
         }
     }
@@ -319,6 +331,11 @@ public class ScriptUI : MonoBehaviour
         dialoguetext.GetComponent<TMP_Text>().text = "";
         done = true;
         skipped = false;
+    }
+
+    public void BackToMenu()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
 
     private void HidePortraits()

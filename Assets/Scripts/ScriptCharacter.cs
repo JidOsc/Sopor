@@ -10,15 +10,15 @@ public class ScriptCharacter : MonoBehaviour
     public int totaltrash = 4;
     private int trashpicked = 0;
 
-    //variabeln ska mäta vart man är i spelet,
+    //variabeln ska mï¿½ta vart man ï¿½r i spelet,
     //0 = tutorial 1
     //1 = tutorial 2
     //2 = plocka sopor
-    //3 = stalker syns utanför fönster
-    //4 = stalker jagar spelare
-    private short stage = 0;
+    //3 = stalker syns utanfï¿½r fï¿½nster
+    //4 = stalker ï¿½r i huset
+    //5 = stalker jagar spelare
+    public short stage = 0;
 
-    private short footstep = 0;
     private bool footcooldown = false;
 
     public new Rigidbody2D rigidbody;
@@ -38,9 +38,13 @@ public class ScriptCharacter : MonoBehaviour
     public GameObject jumpscare;
     public GameObject door;
     public GameObject stalker;
+    public GameObject winzone;
 
     public GameObject tutorial1;
     public GameObject tutorial2;
+
+    public GameObject victorytext;
+    public GameObject victorybutton;
 
     public AudioClip dooropens;
     public AudioClip doorcloses;
@@ -118,7 +122,7 @@ public class ScriptCharacter : MonoBehaviour
 
         if (colliding)
         {
-            if (discoveredobjects.Contains(GameObject.Find("STALKER")) && !hidden && stage == 4)
+            if (discoveredobjects.Contains(GameObject.Find("STALKER")) && !hidden && stage == 5)
             {
                 GameOver();
             }
@@ -131,21 +135,7 @@ public class ScriptCharacter : MonoBehaviour
                     {
                         AudioSource audio = detectedobject.GetComponent<AudioSource>();
 
-                        if (detectedobject.GetComponent<BoxCollider2D>().enabled)
-                        {
-                            detectedobject.GetComponent<SpriteRenderer>().sprite = dooropen;
-                            detectedobject.GetComponent<SpriteRenderer>().sortingOrder = 1;
-                            audio.PlayOneShot(dooropens);
-                            detectedobject.GetComponent<BoxCollider2D>().enabled = false;
-                        }
-
-                        else
-                        {
-                            detectedobject.GetComponent<SpriteRenderer>().sprite = doorclosed;
-                            detectedobject.GetComponent<SpriteRenderer>().sortingOrder = -1;
-                            audio.PlayOneShot(doorcloses);
-                            detectedobject.GetComponent<BoxCollider2D>().enabled = true;
-                        }
+                        Door(detectedobject, detectedobject.GetComponent<BoxCollider2D>().enabled);
 
                         StartCooldown(0.4f);
                         break;
@@ -153,7 +143,7 @@ public class ScriptCharacter : MonoBehaviour
 
                     else if (detectedobject.transform.name.StartsWith("trash") && trashpicked != totaltrash)
                     {
-                        if (trashpicked != totaltrash)
+                        if (trashpicked % 6 != 0 || trashpicked == 0)
                         {
                             trashpicked += 1;
                             totaltrashpicked += 1;
@@ -161,24 +151,28 @@ public class ScriptCharacter : MonoBehaviour
                             switch (totaltrashpicked)
                             {
                                 case 1:
-                                    Canvas.GetComponent<ScriptUI>().UpdateProgress(2);
-                                    break;
-
-                                case 5:
                                     Canvas.GetComponent<ScriptUI>().UpdateProgress(3);
                                     break;
 
+                                case 5:
+                                    Canvas.GetComponent<ScriptUI>().UpdateProgress(4);
+                                    break;
+
                                 case 9:
-                                    door.GetComponent<BoxCollider2D>().enabled = true;
-                                    detectedobject.GetComponent<SpriteRenderer>().sprite = doorclosed;
-                                    door.GetComponent<AudioSource>().PlayOneShot(doorcloses);
+                                    Door(door, false);
                                     break;
 
                                 case 12:
                                     stalker.transform.position = new Vector3(10, -0.25f, 0);
+                                    stalker.GetComponent<SpriteRenderer>().color = Color.white;
                                     stage = 3;
 
-                                    Canvas.GetComponent<ScriptUI>().UpdateProgress(4);
+                                    Canvas.GetComponent<ScriptUI>().UpdateProgress(5);
+                                    break;
+
+                                case 13:
+                                    //stalker bï¿½rjar jaga
+                                    Canvas.GetComponent<ScriptUI>().UpdateProgress(8);
                                     break;
                             }
 
@@ -193,17 +187,17 @@ public class ScriptCharacter : MonoBehaviour
 
                         else
                         {
-                            Canvas.GetComponent<ScriptUI>().UpdateProgress(5);
+                            Canvas.GetComponent<ScriptUI>().UpdateProgress(6);
                         }
                     }
 
                     else if (detectedobject.transform.name == "Trashcan")
                     {
-                        //om antal skräp som plockats upp delat på skräp som ryms i soppåse går jämnt ut
+                        //om antal skrï¿½p som plockats upp delat pï¿½ skrï¿½p som ryms i soppï¿½se gï¿½r jï¿½mnt ut
                         if (opentrash && trashpicked == totaltrash)
                         {
                             trashpicked = 0;
-                            print("slängde sopor");
+                            print("slï¿½ngde sopor");
                             GetComponent<Animator>().SetInteger("trash", 0);
 
                             StartCooldown(0.2f);
@@ -221,11 +215,16 @@ public class ScriptCharacter : MonoBehaviour
                         break;
                     }
 
-                    else if (detectedobject.transform.name.StartsWith("Wardrobe") && !cooldown)
+                    else if (detectedobject.transform.name.StartsWith("Hide") && !cooldown)
                     {
+                        if(stage == 4)
+                        {
+                            Canvas.GetComponent<ScriptUI>().UpdateProgress(9);
+                            stage = 6;
+                        }
+                        
                         if (hidden)
                         {
-
                             StartCooldown(0.6f);
                             hidden = false;
                             GetComponent<SpriteRenderer>().enabled = true;
@@ -246,11 +245,13 @@ public class ScriptCharacter : MonoBehaviour
                         {
                             stage = 2;
                             tutorial2.SetActive(false);
-                            GameObject.Find("Canvas").GetComponent<ScriptUI>().UpdateProgress(1);
+                            GameObject.Find("Canvas").GetComponent<ScriptUI>().UpdateProgress(2);
                         }
 
+                        detectedobject.GetComponent<Animator>().SetBool("music", true);
                         detectedobject.GetComponent<AudioSource>().Play();
                         StartCooldown(0.6f);
+                        Invoke("TurnoffStereo", 43);
                         break;
                     }
                 }
@@ -262,9 +263,9 @@ public class ScriptCharacter : MonoBehaviour
     {
         if (currentroom.x - transform.position.x < 3f && currentroom.x - transform.position.x > -3f)
         {
-            //koden kollar om karaktären är längre än 3 enheter bort från mitten av rummet
-            //(specificerat i en lista längre upp och går på så sätt att utöka fritt)
-            //om den inte är det kommer kameran sättas på positionen av karaktären. På det sättet följer kameran karaktären fram tills ett visst avstånd från mitten
+            //koden kollar om karaktï¿½ren ï¿½r lï¿½ngre ï¿½n 3 enheter bort frï¿½n mitten av rummet
+            //(specificerat i en lista lï¿½ngre upp och gï¿½r pï¿½ sï¿½ sï¿½tt att utï¿½ka fritt)
+            //om den inte ï¿½r det kommer kameran sï¿½ttas pï¿½ positionen av karaktï¿½ren. Pï¿½ det sï¿½ttet fï¿½ljer kameran karaktï¿½ren fram tills ett visst avstï¿½nd frï¿½n mitten
 
             rainemitter.transform.position = new Vector3(transform.position.x, 2, 0);
             cam.transform.position = new Vector3(transform.position.x, 0, -10);
@@ -303,7 +304,7 @@ public class ScriptCharacter : MonoBehaviour
 
     private void CheckCamera()
     {
-        //om karaktären är mer än 6.2 enheter bort från kamerans mittpunkt så kommer kameran flyttas 12 enheter i den riktningen
+        //om karaktï¿½ren ï¿½r mer ï¿½n 6.2 enheter bort frï¿½n kamerans mittpunkt sï¿½ kommer kameran flyttas 12 enheter i den riktningen
         if (currentroom.x + 6.2f < transform.position.x)
         {
             roomnumber += 1;
@@ -316,7 +317,7 @@ public class ScriptCharacter : MonoBehaviour
 
         else if (currentroom.x - 6.2f > transform.position.x)
         {
-            //beroende på om karaktären rör sig till vänster eller höger så kommer det aktiva rummet också röra sig ditåt, viktigt för att veta kamerans relation
+            //beroende pï¿½ om karaktï¿½ren rï¿½r sig till vï¿½nster eller hï¿½ger sï¿½ kommer det aktiva rummet ocksï¿½ rï¿½ra sig ditï¿½t, viktigt fï¿½r att veta kamerans relation
             roomnumber -= 1;
             currentroom = rooms[roomnumber];
 
@@ -328,74 +329,33 @@ public class ScriptCharacter : MonoBehaviour
 
     private void StartCooldown(float duration)
     {
-        //funktion för att istället för att skriva samma två rader av kod hela tiden kunna korta ner det
+        //funktion fï¿½r att istï¿½llet fï¿½r att skriva samma tvï¿½ rader av kod hela tiden kunna korta ner det
         cooldown = true;
         Invoke("Cooldown", duration);
     }
 
     private void Cooldown()
     { 
-        //eftersom den kallas med en Invoke() kommer cooldown avaktiveras efter önskad tid
+        //eftersom den kallas med en Invoke() kommer cooldown avaktiveras efter ï¿½nskad tid
         cooldown = false;
     }
 
-    private void Footsteps()
+    public void Footsteps()
     {
         if (!footcooldown)
         {
-            //varje gång cooldownen har löpt ut kommer ett ljud spelas. Ljudet beror på om man är till vänster eller höger om position x = 2
-            //till vänster är utomhus, höger är inomhus. Sedan finns det 6 olika ljud för de olika miljöerna som körs i en lista efter varandra
-            //så att det blir lite variation och inte samma ljud hela tiden
-            footstep++;
+            //varje gï¿½ng cooldownen har lï¿½pt ut kommer ett ljud spelas. Ljudet beror pï¿½ om man ï¿½r till vï¿½nster eller hï¿½ger om position x = 2
+            //till vï¿½nster ï¿½r utomhus, hï¿½ger ï¿½r inomhus. Sedan finns det 6 olika ljud fï¿½r de olika miljï¿½erna som kï¿½rs i en lista efter varandra
+            //sï¿½ att det blir lite variation och inte samma ljud hela tiden
+
             if (transform.position.x < 2)
             {
-                switch (footstep)
-                {
-                    case 0:
-                        ljud.PlayOneShot(stepsoutside[0]);
-                        break;
-                    case 1:
-                        ljud.PlayOneShot(stepsoutside[1]);
-                        break;
-                    case 2:
-                        ljud.PlayOneShot(stepsoutside[2]);
-                        break;
-                    case 3:
-                        ljud.PlayOneShot(stepsoutside[3]);
-                        break;
-                    case 4:
-                        ljud.PlayOneShot(stepsoutside[4]);
-                        break;
-                    case 5:
-                        ljud.PlayOneShot(stepsoutside[5]);
-                        footstep = -1;
-                        break;
-                }
+                ljud.PlayOneShot(stepsoutside[Random.Range(0, 5)]);
             }
 
             else
-                switch (footstep)
-                {
-                    case 0:
-                        ljud.PlayOneShot(stepsinside[0]);
-                        break;
-                    case 1:
-                        ljud.PlayOneShot(stepsinside[1]);
-                        break;
-                    case 2:
-                        ljud.PlayOneShot(stepsinside[2]);
-                        break;
-                    case 3:
-                        ljud.PlayOneShot(stepsinside[3]);
-                        break;
-                    case 4:
-                        ljud.PlayOneShot(stepsinside[4]);
-                        break;
-                    case 5:
-                        ljud.PlayOneShot(stepsinside[5]);
-                        footstep = -1;
-                        break;
-                }
+            { ljud.PlayOneShot(stepsinside[Random.Range(0, 5)]); }
+
             footcooldown = true;
             Invoke("FootCooldown", 0.6f);
         }
@@ -403,6 +363,11 @@ public class ScriptCharacter : MonoBehaviour
     private void FootCooldown()
     {
         footcooldown = false;
+    }
+
+    private void TurnoffStereo()
+    {
+        GameObject.Find("Speaker").GetComponent<Animator>().SetBool("music", false);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -416,20 +381,26 @@ public class ScriptCharacter : MonoBehaviour
             tutorial1.SetActive(false);
             tutorial2.SetActive(true);
         }
+
+        if(stage == 5 && collision.transform.name == "winzone")
+        {
+            Escape();
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        //plocka bort objektet som man lämnar ur listan
+        //plocka bort objektet som man lï¿½mnar ur listan
         discoveredobjects.Remove(collision.gameObject);
 
-        if (collision.gameObject.name == "Wardrobe" && stage == 3)
+        if (collision.gameObject.name == "HideWardrobe" && stage == 3)
         {
             print("usch");
-            Canvas.GetComponent<ScriptUI>().UpdateProgress(6);
+            Canvas.GetComponent<ScriptUI>().UpdateProgress(7);
+            stage = 6;
         }
 
-        //om listan är tom så kolliderar inte karaktären längre
+        //om listan ï¿½r tom sï¿½ kolliderar inte karaktï¿½ren lï¿½ngre
         if (discoveredobjects.Count == 0)
         {
             colliding = false;
@@ -439,5 +410,36 @@ public class ScriptCharacter : MonoBehaviour
     public void GameOver()
     {
         jumpscare.SetActive(true);
+    }
+
+    public void Door(GameObject door, bool open)
+    {
+        AudioSource audio = door.GetComponent<AudioSource>();
+
+        if (open)
+        {
+            door.GetComponent<SpriteRenderer>().sprite = dooropen;
+            door.GetComponent<SpriteRenderer>().sortingOrder = 1;
+            audio.PlayOneShot(dooropens);
+            door.GetComponent<BoxCollider2D>().enabled = false;
+        }
+
+        else
+        {
+            door.GetComponent<SpriteRenderer>().sprite = doorclosed;
+            door.GetComponent<SpriteRenderer>().sortingOrder = -1;
+            audio.PlayOneShot(doorcloses);
+            door.GetComponent<BoxCollider2D>().enabled = true;
+        }
+    }
+
+    public void Escape()
+    {
+        print("du flydde");
+        stalker.SetActive(false);
+        GameObject.Find("fadebox").GetComponent<Image>().color = new Color(0, 0, 0, 235);
+        victorytext.SetActive(true);
+        victorybutton.SetActive(true);
+        
     }
 }

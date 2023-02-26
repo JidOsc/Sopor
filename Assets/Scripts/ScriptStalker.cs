@@ -30,7 +30,6 @@ public class ScriptStalker : MonoBehaviour
         {
             if (SeesPlayer() && !Character.GetComponent<ScriptCharacter>().hidden)
             {
-                print("karaktär");
                 GetComponent<Rigidbody2D>().velocity = new Vector2(DirToCharacter() * huntspeed, 0);
             }
 
@@ -41,16 +40,28 @@ public class ScriptStalker : MonoBehaviour
                     case 1:
                         direction = Vector2.right;
                         GetComponent<Rigidbody2D>().velocity = Vector2.right * 3;
+                        GetComponent<SpriteRenderer>().flipX = false;
                         break;
 
                     case 2:
                         direction = Vector2.left;
-                        GetComponent<Rigidbody2D>().velocity = Vector2.left * 3;
+                        GetComponent<Rigidbody2D>().velocity = Vector2.left * 4;
+                        GetComponent<SpriteRenderer>().flipX = true;
                         break;
                 }
                 cooldown = true;
                 Invoke("Cooldown", 0.7f);
             }
+        }
+
+        if(GetComponent<Rigidbody2D>().velocity.x != 0)
+        {
+            GetComponent<Animator>().SetBool("walking", true);
+        }
+
+        else
+        {
+            GetComponent<Animator>().SetBool("walking", false);
         }
     }
 
@@ -61,7 +72,6 @@ public class ScriptStalker : MonoBehaviour
 
     private bool SeesPlayer()
     {
-        print("varde ljus");
         //skickar en stråle i riktningen som den kollar ett avstånd som är konfigurerbart
         Vector2 position = transform.position;
         RaycastHit2D hit = Physics2D.Linecast(position + (direction*huntdistance), position, LayerMask.GetMask("Character"));
@@ -79,9 +89,9 @@ public class ScriptStalker : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.transform.name.StartsWith("Door") && !collision.GetComponent<BoxCollider2D>().enabled)
+        if(collision.transform.name.StartsWith("Door") && collision.GetComponent<BoxCollider2D>().enabled)
         {
-            collision.GetComponent<BoxCollider2D>().enabled = true;
+            GameObject.Find("CHARACTER").GetComponent<ScriptCharacter>().Door(collision.gameObject, true);
         }
     }
 }
