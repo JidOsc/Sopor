@@ -253,6 +253,8 @@ public class ScriptCharacter : MonoBehaviour
                         StartCooldown(0.6f);
                         Invoke("TurnoffStereo", 43);
                         break;
+
+                        
                     }
                 }
             }
