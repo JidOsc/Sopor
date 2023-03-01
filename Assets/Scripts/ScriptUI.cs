@@ -280,6 +280,8 @@ public class ScriptUI : MonoBehaviour
 
                 stalker.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
                 stalker.GetComponent<ScriptStalker>().active = true;
+                stalker.GetComponent<AudioSource>().Play();
+
                 character.GetComponent<ScriptCharacter>().stage = 5;
                 winzone.SetActive(true);
 

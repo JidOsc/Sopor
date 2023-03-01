@@ -45,6 +45,7 @@ public class ScriptCharacter : MonoBehaviour
 
     public GameObject victorytext;
     public GameObject victorybutton;
+    public GameObject restartbutton;
 
     public AudioClip dooropens;
     public AudioClip doorcloses;
@@ -346,9 +347,8 @@ public class ScriptCharacter : MonoBehaviour
     {
         if (!footcooldown)
         {
-            //varje g�ng cooldownen har l�pt ut kommer ett ljud spelas. Ljudet beror p� om man �r till v�nster eller h�ger om position x = 2
-            //till v�nster �r utomhus, h�ger �r inomhus. Sedan finns det 6 olika ljud f�r de olika milj�erna som k�rs i en lista efter varandra
-            //s� att det blir lite variation och inte samma ljud hela tiden
+            //varje gång cooldownen har löpt ut spelas ett random ljud från en lista för variation
+            //beroende på vart man är i relation till punkt x2 kommer ljudet låta annorlunda
 
             if (transform.position.x < 2)
             {
@@ -412,6 +412,8 @@ public class ScriptCharacter : MonoBehaviour
     public void GameOver()
     {
         jumpscare.SetActive(true);
+        cam.GetComponent<AudioSource>().Play();
+        restartbutton.SetActive(true);
     }
 
     public void Door(GameObject door, bool open)
@@ -443,5 +445,15 @@ public class ScriptCharacter : MonoBehaviour
         victorytext.SetActive(true);
         victorybutton.SetActive(true);
         
+    }
+
+    public void TryAgain()
+    {
+        Fade();
+        transform.position = new Vector2(13, -0.25f);
+        hidden = true;
+        GetComponent<SpriteRenderer>().enabled = false;
+        Canvas.GetComponent<ScriptUI>().UpdateProgress(9);
+        restartbutton.SetActive(false);
     }
 }
