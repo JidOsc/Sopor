@@ -35,18 +35,20 @@ public class ScriptStalker : MonoBehaviour
 
             else if (!cooldown)
             {
-                switch (Random.Range(1, 3))
+                switch (Random.Range(1, 11))
                 {
                     case 1:
-                        direction = Vector2.right;
-                        GetComponent<Rigidbody2D>().velocity = Vector2.right * 3;
-                        GetComponent<SpriteRenderer>().flipX = false;
+                        GetComponent<SpriteRenderer>().flipX = true;
+                        direction = Vector2.left;
                         break;
 
                     case 2:
-                        direction = Vector2.left;
-                        GetComponent<Rigidbody2D>().velocity = Vector2.left * 4;
-                        GetComponent<SpriteRenderer>().flipX = true;
+                        GetComponent<SpriteRenderer>().flipX = false;
+                        direction = Vector2.right;
+                        break;
+
+                    case > 2:
+                        GetComponent<Rigidbody2D>().velocity = direction * 3;
                         break;
                 }
                 cooldown = true;
@@ -84,14 +86,30 @@ public class ScriptStalker : MonoBehaviour
 
     private float DirToCharacter()
     {
+        //räknar ut vilket håll karaktären är åt
         return Mathf.Clamp(Character.transform.position.x - transform.position.x, -1, 1);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.transform.name.StartsWith("Door") && collision.GetComponent<BoxCollider2D>().enabled)
+        if(collision.transform.name.StartsWith("Door") && collision.GetComponent<BoxCollider2D>().enabled && active)
         {
             GameObject.Find("CHARACTER").GetComponent<ScriptCharacter>().Door(collision.gameObject, true);
+        }
+
+        else if (collision.transform.name.StartsWith("edgeborder"))
+        {
+            if (direction == Vector2.left)
+            {
+                GetComponent<SpriteRenderer>().flipX = false;
+                direction = Vector2.right;
+            }
+
+            else
+            {
+                GetComponent<SpriteRenderer>().flipX = true;
+                direction = Vector2.left;
+            }
         }
     }
 }

@@ -27,7 +27,6 @@ public class ScriptCharacter : MonoBehaviour
 
     private bool cooldown = false;
     private bool opentrash = false;
-    private bool colliding = false;
     public bool hidden = false;
     private bool isfading = false;
     private short totaltrashpicked = 0;
@@ -59,9 +58,11 @@ public class ScriptCharacter : MonoBehaviour
     public AudioClip trashcanopens;
     public AudioClip trashcancloses;
 
+    public AudioClip scream;
+
     private List<GameObject> discoveredobjects = new List<GameObject> { };
 
-
+    //sparar koordinaterna för mitten av varje rum, viktigt för kameran att känna till
     Vector3[] rooms =
     {
         new Vector3(-4, 0, -10),
@@ -69,26 +70,20 @@ public class ScriptCharacter : MonoBehaviour
         new Vector3(20, 0, -10)
     };
 
+    //skapar två listor av ljud som läggs in i Unity, en för ljud utomhus och en inomhus
     public AudioClip[] stepsoutside =
     {};
 
     public AudioClip[] stepsinside =
     {};
 
-    
-
     private Vector3 currentroom;
     private short roomnumber;
 
 
     private void FixedUpdate()
-    {
-        //if (Input.GetKey(KeyCode.LeftShift))
-        //{ speed = 4; }
-
-        //else if (speed != 2)
-        //{ speed = 2; }
-
+    { 
+        //ser till så att karaktären inte kan röra sig om den gömmer 
         if (!hidden && !isfading && !GameObject.Find("Canvas").GetComponent<ScriptUI>().importantdialogue)
         {
             if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
@@ -121,7 +116,8 @@ public class ScriptCharacter : MonoBehaviour
             rigidbody.velocity = new Vector2(0, 0); 
         }
 
-        if (colliding)
+        //om listan på objekt inte är tom (listan ändras långt ner i triggerexit och triggerenter
+        if (discoveredobjects.Count != 0)
         {
             if (discoveredobjects.Contains(GameObject.Find("STALKER")) && !hidden && stage == 5)
             {
@@ -142,7 +138,7 @@ public class ScriptCharacter : MonoBehaviour
                         break;
                     }
 
-                    else if (detectedobject.transform.name.StartsWith("trash") && trashpicked != totaltrash)
+                    else if (detectedobject.transform.name.StartsWith("trash"))
                     {
                         if (trashpicked % 6 != 0 || trashpicked == 0)
                         {
@@ -218,7 +214,7 @@ public class ScriptCharacter : MonoBehaviour
 
                     else if (detectedobject.transform.name.StartsWith("Hide") && !cooldown)
                     {
-                        if(stage == 4)
+                        if(stage == 4 && detectedobject.transform.name == "HideWardrobe")
                         {
                             Canvas.GetComponent<ScriptUI>().UpdateProgress(9);
                             stage = 6;
@@ -229,6 +225,7 @@ public class ScriptCharacter : MonoBehaviour
                             StartCooldown(0.6f);
                             hidden = false;
                             GetComponent<SpriteRenderer>().enabled = true;
+                            GetComponent<BoxCollider2D>().isTrigger = false;
                         }
 
                         else
@@ -236,6 +233,7 @@ public class ScriptCharacter : MonoBehaviour
                             StartCooldown(0.6f);
                             hidden = true;
                             GetComponent<SpriteRenderer>().enabled = false;
+                            GetComponent<BoxCollider2D>().isTrigger = true;
                         }
                         break;
                     }
@@ -278,6 +276,8 @@ public class ScriptCharacter : MonoBehaviour
     private void Start()
     {
         StartCoroutine(Fade());
+
+        //varje halv sekund uppdateras kameran
         InvokeRepeating("CheckCamera", 0.5f, 0.5f);
 
         stage = 0;
@@ -288,6 +288,7 @@ public class ScriptCharacter : MonoBehaviour
 
     IEnumerator Fade()
     {
+        //gör en ruta helt svart, och över tid gör den mer genomskinlig
         isfading = true;
         Color fadecolor = fadebox.GetComponent<Image>().color;
         fadecolor.a = 1;
@@ -374,8 +375,8 @@ public class ScriptCharacter : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        //lägger till objektet som kolliderats med i en lista
         discoveredobjects.Add(collision.gameObject);
-        colliding = true;
 
         if(stage == 0 && collision.transform.name == "Speaker")
         {
@@ -401,23 +402,19 @@ public class ScriptCharacter : MonoBehaviour
             Canvas.GetComponent<ScriptUI>().UpdateProgress(7);
             stage = 6;
         }
-
-        //om listan �r tom s� kolliderar inte karakt�ren l�ngre
-        if (discoveredobjects.Count == 0)
-        {
-            colliding = false;
-        }
     }
 
     public void GameOver()
     {
-        jumpscare.SetActive(true);
-        cam.GetComponent<AudioSource>().Play();
         restartbutton.SetActive(true);
+        jumpscare.SetActive(true);
+        ljud.PlayOneShot(scream); 
+        AudioSource.PlayClipAtPoint(scream, Vector3.zero, 50);
     }
 
     public void Door(GameObject door, bool open)
     {
+        //metoden skickar med vilken dörr det handlar om och ifall dörren ska vara öppen eller stängd
         AudioSource audio = door.GetComponent<AudioSource>();
 
         if (open)
@@ -439,7 +436,6 @@ public class ScriptCharacter : MonoBehaviour
 
     public void Escape()
     {
-        print("du flydde");
         stalker.SetActive(false);
         GameObject.Find("fadebox").GetComponent<Image>().color = new Color(0, 0, 0, 235);
         victorytext.SetActive(true);
@@ -449,11 +445,14 @@ public class ScriptCharacter : MonoBehaviour
 
     public void TryAgain()
     {
-        Fade();
+        //återställer alla värden till vad de var när stalkern började jaga karaktären
         transform.position = new Vector2(13, -0.25f);
+        cam.transform.position = new Vector3(11, 0, -10);
         hidden = true;
         GetComponent<SpriteRenderer>().enabled = false;
         Canvas.GetComponent<ScriptUI>().UpdateProgress(9);
+        jumpscare.SetActive(false);
         restartbutton.SetActive(false);
+        GetComponent<BoxCollider2D>().isTrigger = false;
     }
 }

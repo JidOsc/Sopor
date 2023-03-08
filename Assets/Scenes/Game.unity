@@ -254,6 +254,7 @@ GameObject:
   m_Component:
   - component: {fileID: 78324911}
   - component: {fileID: 78324910}
+  - component: {fileID: 78324912}
   m_Layer: 0
   m_Name: edgeborderLeft
   m_TagString: Untagged
@@ -302,6 +303,32 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 26
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &78324912
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 78324909}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -2.5342674, y: 1.6238995}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.65553665, y: 4.2477994}
+  m_EdgeRadius: 0
 --- !u!1 &80604633
 GameObject:
   m_ObjectHideFlags: 0
@@ -1038,7 +1065,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 264778743}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 590420390}
+        m_TargetAssemblyTypeName: ScriptCharacter, Assembly-CSharp
+        m_MethodName: TryAgain
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &264778743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7378,7 +7417,7 @@ MonoBehaviour:
   tutorial2: {fileID: 340373868}
   victorytext: {fileID: 1546889255}
   victorybutton: {fileID: 1857837773}
-  restartbutton: {fileID: 0}
+  restartbutton: {fileID: 264778740}
   dooropens: {fileID: 8300000, guid: d5f1d79e9b93a8e498835dac5db1d244, type: 3}
   doorcloses: {fileID: 8300000, guid: 81aad940617135d499f5f0c55ca74fbf, type: 3}
   doorclosed: {fileID: 21300000, guid: 6570db158998cd54aada766ca8475a90, type: 3}
@@ -7387,6 +7426,7 @@ MonoBehaviour:
   trashcanopen: {fileID: 21300000, guid: 9e7494217d3e223438c28780aec45c04, type: 3}
   trashcanopens: {fileID: 8300000, guid: ed2e812d527d73d47821d88fe0d70d15, type: 3}
   trashcancloses: {fileID: 8300000, guid: 3d33cac8a51325a49918354b74182992, type: 3}
+  scream: {fileID: 8300000, guid: ed9db215ba35e454ca660129895850f1, type: 3}
   stepsoutside:
   - {fileID: 8300000, guid: 0d17ce1e2d6ad6446ace9c8d0f3c2927, type: 3}
   - {fileID: 8300000, guid: c82e23316431ca6459067b8f0be6c6f5, type: 3}
@@ -7447,7 +7487,7 @@ Rigidbody2D:
   m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 0
+  m_Constraints: 6
 --- !u!95 &590420393
 Animator:
   serializedVersion: 4
@@ -8900,6 +8940,7 @@ GameObject:
   - component: {fileID: 908948414}
   - component: {fileID: 908948413}
   - component: {fileID: 908948412}
+  - component: {fileID: 908948419}
   - component: {fileID: 908948416}
   - component: {fileID: 908948417}
   - component: {fileID: 908948418}
@@ -8920,10 +8961,10 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.0074100494, y: 0.014819384}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -8934,7 +8975,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.42205238, y: 2.066979}
   m_EdgeRadius: 0
 --- !u!50 &908948413
 Rigidbody2D:
@@ -8956,7 +8997,7 @@ Rigidbody2D:
   m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 0
+  m_Constraints: 6
 --- !u!212 &908948414
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -9183,6 +9224,32 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!61 &908948419
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 908948411}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.75, y: 2.078125}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.75, y: 2.078125}
+  m_EdgeRadius: 0
 --- !u!1 &937308216
 GameObject:
   m_ObjectHideFlags: 0
@@ -10001,6 +10068,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1163254792}
   - component: {fileID: 1163254791}
+  - component: {fileID: 1163254793}
   m_Layer: 0
   m_Name: edgeborderRight
   m_TagString: Untagged
@@ -10049,6 +10117,32 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 27
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &1163254793
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163254790}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -3.1721401, y: 1.5038294}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.7650261, y: 4.007659}
+  m_EdgeRadius: 0
 --- !u!1 &1201993221
 GameObject:
   m_ObjectHideFlags: 0
@@ -13303,7 +13397,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   importantdialogue: 0
   done: 1
-  skipcall: 1
+  skipcall: 0
   dialoguetext: {fileID: 1866469970}
   portraitluna: {fileID: 1466331294}
   portraitchar: {fileID: 1660116865}

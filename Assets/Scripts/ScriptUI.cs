@@ -97,6 +97,7 @@ public class ScriptUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //om man trycker på mellanslag och det är en aktiv dialog kommer den visa allt direkt, så man kan skippa RevealText
         if(Input.GetKeyDown(KeyCode.Space) && activedialogue)
         {
             skipped = true;
@@ -106,11 +107,13 @@ public class ScriptUI : MonoBehaviour
 
     public void UpdateProgress(short stage)
     {
+        //metoden finns bara för att kunna köras från andra scripts, då Coroutines inte kan startas därifrån
         StartCoroutine(Dialogue(stage));
     }
 
     IEnumerator RevealText()
     {
+        //under en tid avslöjas en bokstav i taget av vad karaktärerna säger
         while (dialoguetext.GetComponent<TMP_Text>().maxVisibleCharacters < line.Length)
         {
             if(skipped)
@@ -147,6 +150,7 @@ public class ScriptUI : MonoBehaviour
                     yield return new WaitForSeconds(3);
                     activedialogue = importantdialogue = true;
 
+                    //så som dialog funkar är att den visar en line och sedan väntar på att "done" ska markeras som färdigt innan den fortsätter
                     done = false; ShowDialogue(lines[1], 3); while (!done) { yield return null; }
 
                     done = false; ShowDialogue(lines[2], 0); while (!done) { yield return null; }
